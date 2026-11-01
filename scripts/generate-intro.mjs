@@ -76,6 +76,9 @@ const stats = await runIntroGeneration({
   extraBody: isZenMux ? { thinking: { type: "disabled" } } : undefined,
   // ZenMux 免费模型并发很低，并发跑会直接 429；本地串行反而成功率更高。
   concurrency: isZenMux ? 1 : 4,
+  // 免费模型经常抽风 429（“该模型当前访问量过大”），单条重试几次能明显提高成功率。
+  maxRetries: isZenMux ? 3 : 0,
+  retryDelayMs: isZenMux ? 15000 : undefined,
   timeoutMs: Number(
     process.env.INTRO_AI_TIMEOUT_MS ?? (isZenMux ? 120000 : 30000),
   ),
