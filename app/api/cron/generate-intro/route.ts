@@ -14,17 +14,19 @@ export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 /**
- * 每天把 Cloudflare 免费额度用满。
+ * 每天生成多少条。
  *
- * 配额实测：10,000 neurons/天 ÷ 20 neurons/条 ≈ 500 条/天。跑不满就是白扔。
+ * ❗ 这个配额是**账号级共享**的，不是这个站独享：主站的 AI_PROVIDER 也是
+ * cloudflare，post SEO、标签 SEO、搜索相关性排序都走同一个 10,000 neurons/天。
+ * 2026-11-01 实测，主站把额度用完时，这里连一条都跑不动（429）。
  *
- * 吞吐实测：并发 4 时每条约 3.6s。450 条在并发 10 下约 163s，
- * 落在 300s 的函数上限内，留足余量。存量 2,600 多条约 6 天补完。
+ * 所以日产量刻意压到 100（约 2,000 neurons，占 20%），给主站生产环境留余量。
+ * 主站的 AI 是线上功能，卫星站只是补存量，优先级不能反过来。
  *
- * 为什么仍然按天跑而不是一次灌完：额度是每天给的，攒着跑只会撞 429；
- * 而且「站点每天都有新内容」本身就是给爬虫的更新信号。
+ * 要跑得更快只有一个干净办法：给卫星站单独开一个 Cloudflare 账号，
+ * 然后把这个上限和环境变量一起调高。
  */
-const DAILY_LIMIT = Number(process.env.CRON_INTRO_LIMIT ?? 450);
+const DAILY_LIMIT = Number(process.env.CRON_INTRO_LIMIT ?? 100);
 
 /** 并发。抬到 10 是为了在 300s 内跑完 450 条；再高容易撞 Cloudflare 的速率限制。 */
 const CONCURRENCY = Number(process.env.CRON_INTRO_CONCURRENCY ?? 10);
