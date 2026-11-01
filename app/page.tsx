@@ -199,7 +199,7 @@ export default async function HomePage() {
               },
               {
                 title: "去下载页",
-                body: "点「查看该作品资源」跳到下载页面。本站不存游戏文件。",
+                body: "点页面中间金色的 Download 按钮，跳到下载页面。本站不存游戏文件。",
               },
             ].map((item, index) => (
               <article

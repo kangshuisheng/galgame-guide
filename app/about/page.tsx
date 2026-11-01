@@ -24,7 +24,7 @@ export default function AboutPage() {
           <ul className="list-disc space-y-2 pl-5">
             <li><strong>作品资料</strong>：简介、类型标签、平台、语言、版本和更新时间。</li>
             <li><strong>查找</strong>：按作品名、题材或平台搜，也能按热度或更新时间排序。</li>
-            <li><strong>下载入口</strong>：每部作品页都有「查看该作品资源」，点进去就是下载页面。</li>
+            <li><strong>下载入口</strong>：每部作品页都有金色的 Download 下载按钮，点进去就是下载页面。</li>
           </ul>
 
           <h2 className="text-2xl font-bold text-ink-strong">这里没有什么</h2>

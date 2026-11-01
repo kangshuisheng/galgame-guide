@@ -113,3 +113,98 @@ a {
   background: var(--accent);
   box-shadow: 0 0 16px rgba(214, 169, 107, 0.85);
 }
+
+/* 下载按钮动效。全部只改 transform / opacity：
+   不触发布局、不引起 CLS，滚动时也不会重绘整块。 */
+@keyframes cta-arrow-bob {
+  0%,
+  100% {
+    transform: translateY(-1px);
+  }
+  45%,
+  55% {
+    transform: translateY(2.5px);
+  }
+}
+
+@keyframes cta-shine-sweep {
+  0% {
+    transform: translateX(-180%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(340%) skewX(-18deg);
+  }
+}
+
+@keyframes cta-halo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(9, 11, 16, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(9, 11, 16, 0);
+  }
+}
+
+@keyframes cta-dot-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(214, 169, 107, 0.55);
+  }
+  50% {
+    opacity: 0.72;
+    box-shadow: 0 0 0 5px rgba(214, 169, 107, 0);
+  }
+}
+
+.cta-icon-arrow {
+  animation: cta-arrow-bob 2.1s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  transform-origin: center;
+}
+
+.cta-icon-halo {
+  animation: cta-halo-pulse 2.1s ease-out infinite;
+}
+
+.cta-live-dot {
+  animation: cta-dot-breathe 2.1s ease-in-out infinite;
+}
+
+.cta-arrow {
+  transition: transform 0.3s ease;
+}
+
+.group:hover .cta-arrow {
+  transform: translateX(3px);
+}
+
+.cta-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  animation: cta-shine-sweep 4.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-icon-arrow,
+  .cta-icon-halo,
+  .cta-live-dot,
+  .cta-shine {
+    animation: none;
+  }
+
+  .cta-shine {
+    display: none;
+  }
+}
