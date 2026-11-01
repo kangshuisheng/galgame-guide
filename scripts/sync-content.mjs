@@ -50,7 +50,10 @@ runCatalogSync({
   sourceApiUrl,
   pageSize: 50,
   maxPages,
-  categorySlugs: process.env.CONTENT_SYNC_CATEGORY_SLUGS ?? "hentai,game",
+  // 必须和 cron 保持一致：只收游戏分类。`hentai` 是主站的万能分类，
+  // 写成 hentai,game 会把同人志/Cosplay/3D 动画/ASMR 全拉进来。
+  categorySlugs:
+    process.env.CONTENT_SYNC_CATEGORY_SLUGS ?? "game,single-player-games",
   excludeKeywords: process.env.CONTENT_SYNC_EXCLUDE_KEYWORDS ?? undefined,
   imageCdnBase: process.env.CONTENT_SYNC_IMAGE_CDN ?? undefined,
   stopThreshold: Number(process.env.CONTENT_SYNC_STOP_THRESHOLD ?? 100),
