@@ -9,7 +9,9 @@
  *   pnpm intro:gen --limit=50      # 指定条数
  *   pnpm intro:gen --dry-run       # 只调模型、不写库
  *
- * 需要环境变量 CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_AI_API_TOKEN。
+ * 默认用 Cloudflare（需要 CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_AI_API_TOKEN）。
+ * 也可用 ZenMux 免费模型做小批量补充：
+ *   INTRO_AI_PROVIDER=zenmux ZENMUX_API_KEY=... pnpm intro:gen --limit=5
  */
 
 import nextEnv from "@next/env";
@@ -32,9 +34,21 @@ if (!dbUrl) {
   process.exit(1);
 }
 
+const provider = (process.env.INTRO_AI_PROVIDER ?? "cloudflare").toLowerCase();
+const isZenMux = provider === "zenmux";
+if (!["cloudflare", "zenmux"].includes(provider)) {
+  console.error(`[Intro] 不支持的 INTRO_AI_PROVIDER=${provider}。Aborted.`);
+  process.exit(1);
+}
+
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 const apiToken = process.env.CLOUDFLARE_AI_API_TOKEN;
-if (!accountId || !apiToken) {
+const zenMuxKey = process.env.ZENMUX_API_KEY;
+if (isZenMux && !zenMuxKey) {
+  console.error("[Intro] zenmux 模式缺少 ZENMUX_API_KEY。Aborted.");
+  process.exit(1);
+}
+if (!isZenMux && (!accountId || !apiToken)) {
   console.error(
     "[Intro] 缺少 CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_AI_API_TOKEN。Aborted.",
   );
@@ -44,12 +58,27 @@ if (!accountId || !apiToken) {
 const db = createClient({ url: dbUrl, authToken: dbToken });
 
 const startedAt = Date.now();
+console.log(`[Intro] provider=${provider}`);
 const stats = await runIntroGeneration({
   db,
   limit,
-  accountId,
-  apiToken,
-  model: process.env.CLOUDFLARE_AI_MODEL ?? "@cf/openai/gpt-oss-20b",
+  accountId: isZenMux ? undefined : accountId,
+  apiToken: isZenMux ? undefined : apiToken,
+  baseUrl: isZenMux
+    ? process.env.ZENMUX_BASE_URL ?? "https://zenmux.ai/api/v1/chat/completions"
+    : undefined,
+  apiKey: isZenMux ? zenMuxKey : undefined,
+  model: isZenMux
+    ? process.env.ZENMUX_MODEL ?? "z-ai/glm-4.7-flash-free"
+    : process.env.CLOUDFLARE_AI_MODEL ?? "@cf/openai/gpt-oss-20b",
+  // GLM-4.7 Flash 默认强制思考，会把 max_tokens 全烧在 reasoning 上并返回空 content。
+  // ZenMux 的免费模型必须显式关闭 thinking，才能稳定拿到 JSON 正文。
+  extraBody: isZenMux ? { thinking: { type: "disabled" } } : undefined,
+  // ZenMux 免费模型并发很低，并发跑会直接 429；本地串行反而成功率更高。
+  concurrency: isZenMux ? 1 : 4,
+  timeoutMs: Number(
+    process.env.INTRO_AI_TIMEOUT_MS ?? (isZenMux ? 120000 : 30000),
+  ),
   dryRun,
   log: (message) => console.log(message),
 });
