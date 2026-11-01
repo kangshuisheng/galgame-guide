@@ -8,8 +8,11 @@
 # 或者 Vercel 那次跑挂的时候手动推一把。
 #
 # 用法：
-#   bash scripts/backfill-intro.sh          # 默认 460 条
-#   bash scripts/backfill-intro.sh 100      # 指定条数
+#   bash scripts/backfill-intro.sh          # 默认 100 条
+#   bash scripts/backfill-intro.sh 300      # 指定条数（确认配额独立后才调大）
+#
+# ❗ 默认值刻意压到 100：Cloudflare 的 10,000 neurons/天 是**账号级**的，
+# 主站生产 AI 用的是同一个账号。这里吃多了，主站的 post SEO / 搜索排序就没额度了。
 #
 # 幂等：没有待生成条目时引擎会立刻返回；配额已用完时会撞 429 然后中止，
 # 两种情况都只花几秒，重复跑没有副作用。
@@ -37,7 +40,7 @@ if [ -z "${CLOUDFLARE_AI_API_TOKEN:-}" ]; then
   exit 1
 fi
 
-LIMIT="${1:-460}"
+LIMIT="${1:-100}"
 LOG_DIR=".audit"
 mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/intro-backfill-$(date +%Y-%m-%d).log"
