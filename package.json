@@ -10,6 +10,7 @@
     "content:sync": "node scripts/sync-content.mjs",
     "intro:gen": "node scripts/generate-intro.mjs",
     "intro:gen:zenmux": "INTRO_AI_PROVIDER=zenmux node scripts/generate-intro.mjs",
+    "intro:gen:groq": "INTRO_AI_PROVIDER=groq node scripts/generate-intro.mjs",
     "dedupe:games": "node scripts/dedupe-games.mjs",
     "start": "next start",
     "lint": "eslint",
