@@ -52,9 +52,15 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "1Xgn-if-N3BE_rT0R4tVMRVNQH8ouKq1y7suby_9vjM",
-    yandex: "ca96ec0d870b3e63",
+    // 两个 token 都要留：ca96… 对应 galgame-guide.vercel.app，f8ce… 对应 galgame.krzvv.com。
+    // 只写一个会让另一个域名掉验证。
+    yandex: ["ca96ec0d870b3e63", "f8ceb2f80d1d2d6d"],
     other: {
       "6a97888e-site-verification": "bd9f36257c1bd922ea53f45d0aaac602",
+      // Bing Webmaster。为什么不用 DNS 验证：Cloudflare 把 galgame.krzvv.com 同时配了
+      // CNAME（指向 Vercel）和 TXT，而 DNS 规范不允许 CNAME 与其它记录同名共存，
+      // Yandex 的解析器会跟 CNAME 走、丢掉 TXT，实测报 DNS_RECORD_NOT_FOUND。
+      "msvalidate.01": "78516164C70B811236A3C3A8822B0A61",
     },
   },
 };
