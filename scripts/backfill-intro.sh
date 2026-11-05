@@ -4,8 +4,7 @@
 #
 # 为什么需要它：Cloudflare Workers AI 免费额度是 10,000 neurons/天，
 # 每天 UTC 00:00（北京时间 08:00）重置，实测约 20 neurons/条 → 每天最多 500 条。
-# 日常增量由 Vercel Cron（/api/cron/generate-intro，00:05 UTC）负责；
-# 这个脚本是本地兜底，用在存量补齐阶段，或者 Vercel 那次跑挂的时候手动推一把。
+# Vercel 只跑 Cloudflare（00:05 UTC）。ZenMux / Groq 由本机 DSH 每日任务调用本脚本。
 #
 # 用法：
 #   bash scripts/backfill-intro.sh          # 默认 100 条

@@ -35,6 +35,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Build & Deploy
 - `pnpm build` = `node scripts/build-redirects.mjs && next build`。**数据同步不在 build 里**，`vercel.json` 也没有 `buildCommand`。
 - **日常同步是自动的**：`vercel.json` 的 cron 每天 03:00（东八区）请求 `/api/cron/sync-content`，该路由直接拉取主站最新 2 页写 Turso，并 `revalidatePath("/")`、`/archive`。不是"只触发 redeploy"。
+- **作品介绍**：Vercel 只留 Cloudflare 一条（`00:05 UTC`，默认 100 条，给主站留额度）。ZenMux / Groq 走本机 DSH 每日任务，不进 Vercel。
 - 手动命令只用于回填/排查：`pnpm content:sync`（增量 2 页）、`--full`（200 页）、`--dry-run`。路由与 CLI 共用 `lib/sync/engine.mjs`。
 - 主站已删除 `/api/posts/hot-feed`（KrzACG `1fce7991`，2026-10-14）。当前用 `/api/posts/latest` 过渡；公开契约 `/api/public/v1` 目前没有 posts 端点。
 - Turso free tier cold-starts can fail the first DB connection during build; `lib/games.ts` retries with backoff, and homepage/sitemap are ISR (`revalidate`) so they self-heal at runtime

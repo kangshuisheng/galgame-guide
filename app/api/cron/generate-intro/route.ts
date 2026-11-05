@@ -1,121 +1,18 @@
 import { headers } from "next/headers";
-import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
 
-import { siteConfig } from "@/lib/config";
-import { db } from "@/lib/db";
-import { submitSlugs } from "@/lib/indexnow.mjs";
-import { runIntroGeneration } from "@/lib/intro/engine.mjs";
+import { runIntroCron } from "@/lib/intro/cron.mjs";
 
-// Vercel Hobby 的函数上限是 300s（Fluid Compute 之后不再是 60s），
-// 见 https://vercel.com/docs/functions/limitations 。原来按 60s 排的日产量
-// 只有 40 条，2,600 多条存量要跑两个多月。
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 /**
- * 每天生成多少条。
- *
- * ❗ 这个配额是**账号级共享**的，不是这个站独享：主站的 AI_PROVIDER 也是
- * cloudflare，post SEO、标签 SEO、搜索相关性排序都走同一个 10,000 neurons/天。
- * 2026-11-01 实测（Cloudflare GraphQL）：10-31 主站用掉 4,133.8 neurons
- * （gpt-oss-120b 56 次），卫星站用掉 8,112.6（gpt-oss-20b 523 次），
- * 合计 12,246 > 10,000，账号直接进入 429，第二天也没立刻恢复。
- *
- * 所以日产量刻意压到 100（约 2,100 neurons，占 20%），给主站生产环境留余量。
- * 主站的 AI 是线上功能，卫星站只是补存量，优先级不能反过来。
- * 官方重置时间：每天 00:00 UTC（北京时间 08:00）；Vercel Cron 设在 00:05 UTC。
- *
- * 要跑得更快只有一个干净办法：给卫星站单独开一个 Cloudflare 账号，
- * 然后把这个上限和环境变量一起调高。
+ * Cloudflare 通道。与主站共用 10,000 neurons/天，日产量默认 100。
+ * 00:05 UTC = 北京时间 08:05，紧挨免费额度重置。
  */
-const DAILY_LIMIT = Number(process.env.CRON_INTRO_LIMIT ?? 100);
-
-/** 并发。抬到 10 是为了在 300s 内跑完 450 条；再高容易撞 Cloudflare 的速率限制。 */
-const CONCURRENCY = Number(process.env.CRON_INTRO_CONCURRENCY ?? 10);
-
-function isAuthorized(authorization: string | null, userAgent: string | null) {
-  if (siteConfig.cronSecret) {
-    return authorization === `Bearer ${siteConfig.cronSecret}`;
-  }
-  return Boolean(userAgent?.includes("vercel-cron"));
-}
-
 export async function GET(request: Request) {
-  const requestHeaders = await headers();
-  const authorization = requestHeaders.get("authorization");
-  const userAgent = requestHeaders.get("user-agent");
-
-  if (!siteConfig.cronSecret) {
-    console.warn(
-      "[Cron] CRON_SECRET is not configured; falling back to User-Agent check. Set CRON_SECRET to enforce bearer auth.",
-    );
-  }
-
-  if (!isAuthorized(authorization, userAgent)) {
-    console.error("[Cron] Unauthorized access attempt.");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const apiToken = process.env.CLOUDFLARE_AI_API_TOKEN;
-  if (!accountId || !apiToken) {
-    // 不当作错误：没配 AI 凭证时站点照常跑，只是不生成新介绍。
-    console.warn("[Cron] AI 凭证未配置，跳过本次生成。");
-    return NextResponse.json(
-      { ok: false, skipped: true, reason: "AI credentials not configured" },
-      { status: 200 },
-    );
-  }
-
-  const startedAt = Date.now();
-  const dryRun = new URL(request.url).searchParams.get("dry_run") === "1";
-
-  try {
-    const stats = await runIntroGeneration({
-      db,
-      limit: DAILY_LIMIT,
-      accountId,
-      apiToken,
-      model: process.env.CLOUDFLARE_AI_MODEL ?? "@cf/openai/gpt-oss-20b",
-      concurrency: CONCURRENCY,
-      dryRun,
-      log: (message) => console.log(message),
-    });
-
-    if (!dryRun && stats.written > 0) {
-      // 新介绍落地就让首页与索引页重建，不必等 ISR 窗口
-      revalidatePath("/");
-      revalidatePath("/archive");
-
-      // 作品页是 24h 的 ISR 缓存，不逐个失效的话，新介绍要等一天才可见 ——
-      // 「每天都有更新」这个信号就断了。只失效本次真改过的页面。
-      for (const slug of stats.writtenSlugs) revalidatePath(`/${slug}`);
-
-      // 介绍被重写 = 这些页面内容真的变了，主动推给 Bing，不用等它排到抓取队列。
-      // submitSlugs 内部吞掉异常：推送失败不能让已经写好的数据被当成任务失败。
-      await submitSlugs({
-        siteUrl: siteConfig.siteUrl,
-        key: siteConfig.indexNowKey,
-        slugs: stats.writtenSlugs,
-        log: (message) => console.log(message),
-      });
-    }
-
-    const durationMs = Date.now() - startedAt;
-    console.log("[Cron] intro done:", { ...stats, durationMs });
-    return NextResponse.json({
-      ok: true,
-      ...stats,
-      durationMs,
-      generatedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("[Cron] intro failed:", message);
-    return NextResponse.json(
-      { ok: false, message, durationMs: Date.now() - startedAt },
-      { status: 502 },
-    );
-  }
+  return runIntroCron({
+    provider: "cloudflare",
+    request,
+    requestHeaders: await headers(),
+  });
 }

@@ -42,6 +42,9 @@ pnpm build
 拉取主站最新 2 页（约 100 条）写进 Turso，并触发首页 / 作品索引重新验证。
 `vercel.json` 里配置这条 cron；路由与 CLI 共用 `lib/sync/engine.mjs`，不存在两份逻辑。
 
+**作品介绍**：Vercel 每天只跑 Cloudflare（08:05 北京时间，默认 100 条）。
+ZenMux / Groq 在本机 DSH 每日任务里把各自免费额度用完，不进线上 cron。
+
 手动命令只用于回填和排查：
 
 ```bash
