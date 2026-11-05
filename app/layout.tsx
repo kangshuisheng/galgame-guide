@@ -6,6 +6,7 @@ import "@/app/globals.css";
 import { BookmarkHint } from "@/components/bookmark-hint";
 import { Navbar } from "@/components/navbar";
 import { analytics, buildGoPath, siteConfig } from "@/lib/config";
+import { OG_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -23,9 +24,9 @@ export const metadata: Metadata = {
     "游戏版本情报",
     "视觉小说",
   ],
-  alternates: {
-    canonical: "/",
-  },
+  // canonical 不在这里写：layout 的值会被所有没覆盖的子页继承，
+  // 2026-11-05 审计实测 /about /contact /privacy /terms 四页因此全部指向首页，
+  // 等于让搜索引擎把它们当成首页副本。canonical 一律由各页自己声明。
   robots: {
     index: true,
     follow: true,
@@ -44,11 +45,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_CN",
     url: "/",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: [OG_IMAGE],
   },
   verification: {
     google: "1Xgn-if-N3BE_rT0R4tVMRVNQH8ouKq1y7suby_9vjM",

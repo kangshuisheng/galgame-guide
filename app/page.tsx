@@ -10,6 +10,7 @@ import {
   buildHomeDescription,
   buildHomeKeywords,
   buildHomeTitle,
+  OG_IMAGE,
 } from "@/lib/seo";
 
 export const revalidate = 3600;
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
     description: buildHomeDescription(),
     type: "website",
     url: "/",
+    images: [OG_IMAGE],
   },
 };
 
@@ -49,7 +51,7 @@ export default async function HomePage() {
     url: siteConfig.siteUrl,
     about: [
       "Galgame Guide",
-      "Galgame 作品库",
+      "Galgame 游戏库",
       "视觉小说目录",
       "作品标签",
       "视觉小说",

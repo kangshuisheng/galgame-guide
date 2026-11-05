@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { BookmarkHint } from "@/components/bookmark-hint";
 import { MainSiteCta, MobileStickyCta } from "@/components/main-site-cta";
 import { RelatedGames } from "@/components/related-games";
+import { buildGoPath } from "@/lib/config";
 import { getAllGames, getAllSlugs, getGameBySlug } from "@/lib/games";
 import { getRelatedGames } from "@/lib/related-games";
 import {
@@ -14,6 +15,7 @@ import {
   buildGameKeywords,
   buildGameStructuredData,
   buildGameTitle,
+  OG_IMAGE,
 } from "@/lib/seo";
 
 export const revalidate = 86400;
@@ -67,11 +69,13 @@ export async function generateMetadata({
       description,
       url: canonical,
       type: "article",
+      images: [OG_IMAGE],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -135,7 +139,7 @@ export default async function GamePage({
           <div className="flex flex-wrap items-center gap-3">
             <span className="eyebrow">作品资料</span>
             <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/50">
-              资料来自公开来源，仅供参考
+              资料整理自开发商与发行方公开信息
             </span>
           </div>
 
@@ -204,6 +208,21 @@ export default async function GamePage({
                 </div>
               ))}
             </dl>
+
+            <p className="mt-4 text-sm leading-7 text-white/45">
+              作品名称、简介与版本信息整理自开发商、发行方和商店页面的公开资料。
+              发现错漏，欢迎到{" "}
+              <a
+                href={buildGoPath("site")}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                referrerPolicy="no-referrer"
+                className="text-accent hover:underline"
+              >
+                KrzACG 社区
+              </a>{" "}
+              告诉我们。
+            </p>
           </section>
 
         </article>

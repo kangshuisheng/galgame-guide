@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 
+import { OG_IMAGE } from "@/lib/seo";
+
 export const metadata: Metadata = {
   title: "免责声明",
   description: "Galgame Guide 的免责声明与内容使用说明。",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "免责声明",
+    description: "Galgame Guide 的免责声明与内容使用说明。",
+    url: "/contact",
+    type: "website",
+    images: [OG_IMAGE],
+  },
 };
 
 export default function ContactPage() {

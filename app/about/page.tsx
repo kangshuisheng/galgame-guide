@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 
+import { OG_IMAGE } from "@/lib/seo";
+
 export const metadata: Metadata = {
   title: "关于我们",
   description: "Galgame Guide 收录什么、怎么用，以及本站不提供什么。",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "关于我们",
+    description: "Galgame Guide 收录什么、怎么用，以及本站不提供什么。",
+    url: "/about",
+    type: "website",
+    images: [OG_IMAGE],
+  },
 };
 
 export default function AboutPage() {

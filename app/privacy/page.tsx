@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 
+import { OG_IMAGE } from "@/lib/seo";
+
 export const metadata: Metadata = {
   title: "隐私政策",
   description: "Galgame Guide 会收集哪些数据、怎么用、怎么关。",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "隐私政策",
+    description: "Galgame Guide 会收集哪些数据、怎么用、怎么关。",
+    url: "/privacy",
+    type: "website",
+    images: [OG_IMAGE],
+  },
 };
 
 export default function PrivacyPage() {

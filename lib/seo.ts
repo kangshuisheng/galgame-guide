@@ -4,7 +4,7 @@ import type { GameRecord } from "@/lib/types/game";
 const sharedKeywords = [
   "Galgame",
   "视觉小说",
-  "Galgame 作品库",
+  "Galgame 游戏库",
   "视觉小说作品",
   "游戏类型",
   "游戏版本",
@@ -17,6 +17,20 @@ const sharedKeywords = [
 const TITLE_MAX = 70;
 
 const BRAND_SUFFIX = " | Galgame Guide";
+
+/**
+ * 全站共用的分享图。
+ *
+ * 为什么要有：2026-11-05 JEV SEO 审计实测 25 个页面只有 og:title 没有 og:image，
+ * 分享到 Telegram / Discord / X 时是一条没有封面的裸链接，点击率吃亏。
+ * 图片是 public/og.png（1200×630，暗底金线，和站内配色一致）。
+ */
+export const OG_IMAGE = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "Galgame Guide · Galgame 与视觉小说作品库",
+};
 
 const KANA = /[\u3040-\u309f\u30a0-\u30ff]/;
 const HAN = /[\u4e00-\u9fff]/;
@@ -138,7 +152,7 @@ const toIsoDateTime = (value: string) => {
 };
 
 export const buildHomeTitle = () =>
-  "Galgame Guide｜Galgame 与视觉小说作品库";
+  "Galgame 游戏库｜Galgame Guide";
 
 export const buildHomeDescription = () =>
   "收录 3800 多部 Galgame 与视觉小说，可按作品名、类型、平台和语言查找。每部都有简介、类型标签、版本和更新时间，找到想玩的直接跳下载页。";

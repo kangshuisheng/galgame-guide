@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GameCard } from "@/components/game-card";
 import { findGames, getTopTags, type CatalogSort } from "@/lib/games";
-import { buildCanonicalPath } from "@/lib/seo";
+import { buildCanonicalPath, OG_IMAGE } from "@/lib/seo";
 
 export const revalidate = 3600;
 
@@ -26,6 +26,14 @@ export async function generateMetadata({
       "浏览 Galgame Guide 收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
     alternates: {
       canonical: buildCanonicalPath("archive"),
+    },
+    openGraph: {
+      title: "全部作品",
+      description:
+        "浏览 Galgame Guide 收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
+      url: buildCanonicalPath("archive"),
+      type: "website",
+      images: [OG_IMAGE],
     },
     robots: isFiltered ? { index: false, follow: true } : undefined,
   };

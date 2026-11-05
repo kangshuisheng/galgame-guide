@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 
+import { OG_IMAGE } from "@/lib/seo";
+
 export const metadata: Metadata = {
   title: "服务条款",
   description: "Galgame Guide 的服务说明、使用限制、版权声明与免责条款。",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "服务条款",
+    description: "Galgame Guide 的服务说明、使用限制、版权声明与免责条款。",
+    url: "/terms",
+    type: "website",
+    images: [OG_IMAGE],
+  },
 };
 
 export default function TermsPage() {
