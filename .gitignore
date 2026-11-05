@@ -29,6 +29,7 @@ lib/generated-redirects.ts
 # Audit/build logs (may contain slug/title lists)
 audit-report.json
 build.log
+.audit/
 
 # Vercel
 .vercel
