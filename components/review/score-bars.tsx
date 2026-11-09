@@ -10,21 +10,23 @@ const SCORE_FIELDS: Array<{ key: keyof ReviewScores; label: string }> = [
 
 export function ScoreBars({ scores }: { scores: ReviewScores }) {
   return (
-    <div className="space-y-4">
+    <div className="review-score-bars">
       {SCORE_FIELDS.map((field) => {
         const value = Math.max(0, Math.min(10, scores[field.key]));
         return (
-          <div key={field.key} className="grid grid-cols-[4rem_minmax(0,1fr)_2.5rem] items-center gap-3">
-            <span className="text-xs tracking-[0.16em] text-white/50">{field.label}</span>
-            <div className="h-1.5 overflow-hidden rounded-full bg-white/8">
-              <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,var(--accent),var(--accent-strong))]"
-                style={{ width: `${value * 10}%` }}
-              />
+          <div key={field.key} className="review-score-row">
+            <span className="review-score-label">{field.label}</span>
+            <div
+              className="review-score-track"
+              role="meter"
+              aria-label={`${field.label}评分`}
+              aria-valuemin={0}
+              aria-valuemax={10}
+              aria-valuenow={value}
+            >
+              <span className="review-score-fill" style={{ width: `${value * 10}%` }} />
             </div>
-            <span className="text-right font-display text-lg text-ink-strong">
-              {value.toFixed(1)}
-            </span>
+            <span className="review-score-value">{value.toFixed(1)}</span>
           </div>
         );
       })}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
 import { GameCard } from "@/components/game-card";
+import { getAllReviews } from "@/lib/review/reviews";
 import { findGames, getTopTags, type CatalogSort } from "@/lib/games";
 import { buildCanonicalPath, OG_IMAGE } from "@/lib/seo";
 
@@ -23,14 +25,14 @@ export async function generateMetadata({
   return {
     title: "全部作品",
     description:
-      "浏览 Galgame Guide 收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
+      "浏览旮旯喵评资料库收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
     alternates: {
       canonical: buildCanonicalPath("archive"),
     },
     openGraph: {
       title: "全部作品",
       description:
-        "浏览 Galgame Guide 收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
+        "浏览旮旯喵评资料库收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
       url: buildCanonicalPath("archive"),
       type: "website",
       images: [OG_IMAGE],
@@ -67,10 +69,17 @@ export default async function ArchivePage({
     : "latest";
   const pageSize = 48;
 
-  const [{ games, total }, topTags] = await Promise.all([
+  const [{ games, total }, topTags, reviews] = await Promise.all([
     findGames({ query: q, tag, sort, page, pageSize }),
     getTopTags(14),
+    getAllReviews(),
   ]);
+  const reviewByGuide = new Map(
+    reviews
+      .filter((review) => review.guideSlug)
+      .map((review) => [review.guideSlug as string, review]),
+  );
+  const reviewByTitle = new Map(reviews.map((review) => [review.title, review]));
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -100,55 +109,47 @@ export default async function ArchivePage({
   })();
 
   return (
-    <main className="shell">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-12 px-5 py-12 sm:px-8 lg:px-12">
-        <header className="space-y-4">
-          <span className="eyebrow">全部作品</span>
-          <h1 className="font-display text-5xl text-ink-strong sm:text-6xl">
-            全部作品
-          </h1>
-          <p className="max-w-2xl text-lg text-ink-soft">
-            按作品名、题材或平台查找，也能按热度或更新时间排序。当前共 {total} 部。
+    <main className="miao-page">
+      <div className="miao-container">
+        <header className="miao-page-head">
+          <span className="miao-kicker">
+            <span className="miao-kicker-dot" aria-hidden="true" />
+            GALGAME GUIDE · 资料库
+          </span>
+          <h1>全部作品</h1>
+          <p>
+            按作品名、题材或平台查找，也能按热度或更新时间排序。当前共 {total} 部，
+            其中带「喵评」印章的作品，点进去就能看猫猫的评分和结论。
           </p>
         </header>
 
-        <section className="space-y-5 rounded-[2rem] border border-white/10 bg-black/20 p-5 sm:p-7">
-          <form method="get" action="/archive" className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_12rem_auto]">
-            <label className="space-y-2">
-              <span className="text-xs uppercase tracking-[0.18em] text-white/45">搜作品</span>
+        <section className="miao-filter-panel miao-paper">
+          <form method="get" action="/archive" className="miao-filter-form">
+            <label className="miao-field">
+              <span className="miao-field-label">搜作品</span>
               <input
                 name="q"
                 defaultValue={q}
                 placeholder="作品名、题材或平台"
-                className="w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-3 text-sm text-ink-strong outline-none placeholder:text-white/35 focus:border-accent/70"
+                className="miao-input"
               />
             </label>
-            <label className="space-y-2">
-              <span className="text-xs uppercase tracking-[0.18em] text-white/45">排序</span>
-              <select
-                name="sort"
-                defaultValue={sort}
-                className="w-full rounded-2xl border border-white/12 bg-[#101318] px-4 py-3 text-sm text-ink-strong outline-none focus:border-accent/70"
-              >
+            <label className="miao-field">
+              <span className="miao-field-label">排序</span>
+              <select name="sort" defaultValue={sort} className="miao-select">
                 <option value="latest">最近更新</option>
                 <option value="popular">热度优先</option>
                 <option value="title">标题顺序</option>
               </select>
             </label>
             {tag ? <input type="hidden" name="tag" value={tag} /> : null}
-            <button className="self-end rounded-2xl bg-accent px-6 py-3 text-sm font-semibold text-black transition hover:bg-accent-strong">
-              筛选
-            </button>
+            <button className="miao-btn miao-btn--primary">筛选</button>
           </form>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="miao-tag-row miao-filter-tags">
             <Link
               href={buildArchiveHref({ q, tag, sort }, { tag: "", page: 1 })}
-              className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                !tag
-                  ? "border-accent/60 bg-accent/10 text-accent"
-                  : "border-white/10 text-white/60 hover:border-white/25"
-              }`}
+              className={`miao-tag${!tag ? " is-active" : ""}`}
             >
               全部标签
             </Link>
@@ -156,11 +157,7 @@ export default async function ArchivePage({
               <Link
                 key={item.name}
                 href={buildArchiveHref({ q, tag, sort }, { tag: item.name, page: 1 })}
-                className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                  tag === item.name
-                    ? "border-accent/60 bg-accent/10 text-accent"
-                    : "border-white/10 text-white/60 hover:border-white/25"
-                }`}
+                className={`miao-tag${tag === item.name ? " is-active" : ""}`}
               >
                 {item.name} · {item.count}
               </Link>
@@ -168,48 +165,38 @@ export default async function ArchivePage({
           </div>
         </section>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="miao-game-grid">
           {games.map((game) => (
-            <GameCard key={game.slug} game={game} />
+            <GameCard key={game.slug} game={game} review={reviewByGuide.get(game.slug) ?? reviewByTitle.get(game.title)} />
           ))}
         </div>
 
         {games.length === 0 && (
-          <div className="rounded-[2.5rem] border border-white/10 bg-black/20 py-20 text-center">
-            <p className="text-ink-soft">没有匹配条目。请减少关键词，或清除标签后重试。</p>
-            <Link href="/archive" className="mt-4 inline-flex text-sm text-accent hover:underline">
-              清除筛选
-            </Link>
+          <div className="miao-empty">
+            <p>没有匹配条目。请减少关键词，或清除标签后重试。</p>
+            <Link href="/archive" className="miao-section-link">清除筛选</Link>
           </div>
         )}
 
         {totalPages > 1 && (
-          <nav className="flex flex-wrap items-center justify-center gap-2">
+          <nav className="miao-pagination" aria-label="分页">
             {page > 1 && (
               <Link
                 href={buildArchiveHref({ q, tag, sort }, { page: page - 1 })}
-                className="rounded-full border border-white/12 px-5 py-2.5 text-sm tracking-[0.12em] text-white/75 transition hover:border-accent/60 hover:text-ink-strong"
+                className="miao-page-link"
               >
                 ← 上一页
               </Link>
             )}
             {pageNumbers.map((p, i) =>
               p === "..." ? (
-                <span
-                  key={`ellipsis-${i}`}
-                  className="px-2 text-sm text-white/40"
-                >
-                  ...
-                </span>
+                <span key={`ellipsis-${i}`} className="miao-page-ellipsis">...</span>
               ) : (
                 <Link
                   key={p}
                   href={buildArchiveHref({ q, tag, sort }, { page: Number(p) })}
-                  className={`rounded-full px-5 py-2.5 text-sm tracking-[0.12em] transition ${
-                    p === page
-                      ? "bg-accent font-semibold text-black"
-                      : "border border-white/12 text-white/75 hover:border-accent/60 hover:text-ink-strong"
-                  }`}
+                  className={`miao-page-link${p === page ? " is-active" : ""}`}
+                  aria-current={p === page ? "page" : undefined}
                 >
                   {p}
                 </Link>
@@ -218,7 +205,7 @@ export default async function ArchivePage({
             {page < totalPages && (
               <Link
                 href={buildArchiveHref({ q, tag, sort }, { page: page + 1 })}
-                className="rounded-full border border-white/12 px-5 py-2.5 text-sm tracking-[0.12em] text-white/75 transition hover:border-accent/60 hover:text-ink-strong"
+                className="miao-page-link"
               >
                 下一页 →
               </Link>
@@ -226,11 +213,8 @@ export default async function ArchivePage({
           </nav>
         )}
 
-        <footer className="mt-12 flex justify-center border-t border-white/10 pt-12">
-          <Link
-            href="/"
-            className="rounded-full border border-white/12 px-8 py-4 text-sm font-semibold tracking-[0.16em] text-white/75 transition hover:border-accent/60 hover:text-ink-strong"
-          >
+        <footer className="miao-archive-footer">
+          <Link href="/" className="miao-btn miao-btn--secondary">
             返回首页
           </Link>
         </footer>

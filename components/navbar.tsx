@@ -1,70 +1,94 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { CatMark } from "@/components/review/cat-mascot";
+
 const navLinks = [
-  { href: "/", label: "首页" },
-  { href: "/archive", label: "全部作品" },
-  { href: "/review", label: "品鉴" },
-  { href: "/about", label: "关于我们" },
-  { href: "/contact", label: "联系" },
+  { href: "/", label: "首页", section: "home" },
+  { href: "/archive", label: "资料库", section: "archive" },
+  { href: "/review", label: "喵评", section: "review" },
+  { href: "/about", label: "关于", section: "about" },
+  { href: "/contact", label: "联系", section: "contact" },
 ];
+
+function currentSection(pathname: string) {
+  if (pathname === "/") return "home";
+  if (pathname.startsWith("/review")) return "review";
+  if (pathname === "/about" || pathname === "/privacy" || pathname === "/terms") return "about";
+  if (pathname === "/contact") return "contact";
+  // 作品详情、归档、搜索都属于「资料库」模块。
+  return "archive";
+}
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname() ?? "/";
+  const section = currentSection(pathname);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
-        <Link href="/" className="font-display text-lg tracking-[0.08em] text-ink-strong">
-          Galgame Guide
+    <header className="miao-nav">
+      <div className="miao-nav-inner">
+        <Link href="/" className="miao-brand" >
+          <CatMark className="miao-brand-mark" />
+          <span className="miao-brand-text">
+            <strong>旮旯喵评</strong>
+            <small>GALGAME GUIDE</small>
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 sm:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-4 py-2 text-sm tracking-[0.1em] text-white/65 transition hover:bg-white/5 hover:text-ink-strong"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="miao-nav-links" aria-label="主导航">
+          {navLinks.map((link) => {
+            const active = section === link.section;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`miao-nav-link${active ? " is-active" : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70 sm:hidden"
+          type="button"
+          className="miao-menu-button"
           onClick={() => setOpen(!open)}
-          aria-label="菜单"
+          aria-label={open ? "关闭菜单" : "打开菜单"}
+          aria-expanded={open}
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             {open ? (
-              <>
-                <path d="M2 2L16 16M2 16L16 2" stroke="currentColor" strokeWidth="1.5" />
-              </>
+              <path d="M2 2L16 16M2 16L16 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             ) : (
-              <>
-                <path d="M1 5H17M1 9H17M1 13H17" stroke="currentColor" strokeWidth="1.5" />
-              </>
+              <path d="M1 5H17M1 9H17M1 13H17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             )}
           </svg>
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-white/5 bg-black/80 px-5 py-4 backdrop-blur-xl sm:hidden">
-          <nav className="flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-xl px-4 py-3 text-sm tracking-[0.1em] text-white/65 transition hover:bg-white/5 hover:text-ink-strong"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+        <div className="miao-mobile-menu">
+          <nav className="miao-mobile-links" aria-label="移动端导航">
+            {navLinks.map((link) => {
+              const active = section === link.section;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`miao-mobile-link${active ? " is-active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}

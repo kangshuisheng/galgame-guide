@@ -6,34 +6,44 @@
 @source "../app";
 @source "../components";
 
+/* ========================================================================== */
+/* 旮旯喵评 — 全站设计系统                                                     */
+/* 一个项目、一套纸页视觉；资料库和喵评只是同一品牌下的两个模块。               */
+/* ========================================================================== */
+
 :root {
-  --background: #090b10;
-  --background-soft: #111520;
-  --panel: rgba(255, 255, 255, 0.06);
-  --line: rgba(255, 255, 255, 0.12);
-  --accent: #d6a96b;
-  --accent-strong: #f2d2a5;
-  --ink-strong: #f6efe5;
-  --ink-soft: rgba(246, 239, 229, 0.74);
-  --shadow: rgba(0, 0, 0, 0.28);
-  --font-body: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong",
-    "PMingLiU", Georgia, serif;
-  --font-display: "Baskerville", "Times New Roman", "Songti SC",
-    "Source Han Serif SC", serif;
+  --miao-paper: #fbf1dc;
+  --miao-paper-2: #fff8ea;
+  --miao-paper-3: #f5e6c9;
+  --miao-ink: #2f2a24;
+  --miao-ink-soft: #625442;
+  --miao-coral: #e86852;
+  --miao-coral-ink: #b54332;
+  --miao-coral-soft: #f9d3c8;
+  --miao-mint: #6eb7a3;
+  --miao-mint-soft: #dcefe6;
+  --miao-butter: #f2c75c;
+  --miao-sky: #8ab9d8;
+  --miao-pink: #f3a7b8;
+  --miao-line: rgba(47, 42, 36, 0.18);
+  --miao-shadow: rgba(86, 61, 29, 0.14);
+  --miao-display: "Yuanti SC", "Hiragino Maru Gothic ProN", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  --miao-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", sans-serif;
+  --miao-hand: "Kaiti SC", "STKaiti", "KaiTi", "FangSong", serif;
+  --miao-mono: "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--ink-strong);
-  /* Tailwind v4 已移除 v3 的 `[--foo]` → `var(--foo)` 隐式转换。
-     这些语义色必须注册成主题变量，才能用 text-ink-strong / bg-accent
-     这类命名 utility（以及 /10 透明度修饰符）生成合法 CSS。 */
-  --color-ink-strong: var(--ink-strong);
-  --color-ink-soft: var(--ink-soft);
-  --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --font-sans: var(--font-body);
-  --font-display: var(--font-display);
+  --color-background: var(--miao-paper);
+  --color-foreground: var(--miao-ink);
+  --color-ink-strong: var(--miao-ink);
+  --color-ink-soft: var(--miao-ink-soft);
+  --color-accent: var(--miao-coral);
+  --color-accent-strong: var(--miao-coral-soft);
+  --font-sans: var(--miao-body);
+  --font-display: var(--miao-display);
 }
 
 * {
@@ -46,24 +56,27 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(214, 169, 107, 0.18), transparent 34%),
-    radial-gradient(circle at top right, rgba(123, 79, 46, 0.22), transparent 28%),
-    linear-gradient(180deg, #0a0d14 0%, #090b10 55%, #111520 100%);
-  color: var(--ink-strong);
-  font-family: var(--font-body), serif;
+  margin: 0;
+  background-color: var(--miao-paper);
+  background-image:
+    radial-gradient(circle at 8% 4%, rgba(232, 104, 82, 0.12), transparent 25rem),
+    radial-gradient(circle at 92% 0%, rgba(110, 183, 163, 0.16), transparent 22rem),
+    linear-gradient(rgba(47, 42, 36, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 42, 36, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px, 28px 28px;
+  color: var(--miao-ink);
+  font-family: var(--miao-body);
 }
 
 body::before {
   position: fixed;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   content: "";
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent 88%);
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 
 a {
@@ -71,58 +84,1605 @@ a {
   text-decoration: none;
 }
 
-.font-display {
-  font-family: var(--font-display), serif;
+button,
+input,
+select {
+  font: inherit;
 }
 
-.shell {
+button {
+  cursor: pointer;
+}
+
+/* 页面骨架 ---------------------------------------------------------------- */
+.miao-page {
   position: relative;
-  isolation: isolate;
+  z-index: 1;
+  min-height: 100vh;
 }
 
-.shell::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 22%),
-    radial-gradient(circle at 80% 0%, rgba(214, 169, 107, 0.08), transparent 20%);
-  opacity: 0.8;
+.miao-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.2rem 1.25rem 5rem;
 }
 
-.eyebrow {
+.miao-narrow {
+  max-width: 880px;
+}
+
+/* 通用纸片 / 标签 / 按钮 -------------------------------------------------- */
+.miao-paper {
+  position: relative;
+  border: 2px solid var(--miao-ink);
+  border-radius: 1.4rem 1.1rem 1.5rem 1.15rem;
+  background: var(--miao-paper-2);
+  box-shadow: 5px 6px 0 var(--miao-shadow);
+}
+
+.miao-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 0.55rem 1rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
+  gap: 0.55rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
 }
 
-.eyebrow::before {
-  content: "";
-  width: 0.45rem;
-  height: 0.45rem;
+.miao-kicker-dot {
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 0 16px rgba(214, 169, 107, 0.85);
+  background: var(--miao-coral);
+  box-shadow: 0 0 0 3px var(--miao-coral-soft);
 }
 
-/* 下载按钮动效。全部只改 transform / opacity：
-   不触发布局、不引起 CLS，滚动时也不会重绘整块。 */
+.miao-chip {
+  display: inline-flex;
+  max-width: 100%;
+  white-space: normal;
+  align-items: center;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 999px;
+  background: var(--miao-paper-2);
+  padding: 0.45rem 0.8rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.miao-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 999px;
+  padding: 0.68rem 1.15rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 3px 3px 0 rgba(47, 42, 36, 0.15);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.miao-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(47, 42, 36, 0.16);
+}
+
+.miao-btn--primary {
+  background: var(--miao-coral-ink);
+  color: var(--miao-paper-2);
+}
+
+.miao-btn--secondary {
+  background: var(--miao-paper-2);
+  color: var(--miao-ink);
+}
+
+.miao-btn--mint {
+  background: var(--miao-mint);
+  color: var(--miao-ink);
+}
+
+.miao-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.miao-tag {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 999px;
+  background: var(--miao-paper-2);
+  padding: 0.3rem 0.65rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.miao-tag:hover,
+.miao-tag.is-active {
+  border-color: var(--miao-ink);
+  background: var(--miao-butter);
+  color: var(--miao-ink);
+}
+
+.miao-section {
+  margin-top: 3.2rem;
+}
+
+.miao-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.3rem;
+}
+
+.miao-section-title {
+  margin-top: 0.25rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+}
+
+.miao-section-desc {
+  max-width: 30rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.8;
+}
+
+.miao-section-link {
+  flex: 0 0 auto;
+  color: var(--miao-coral-ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.28em;
+}
+
+.miao-empty {
+  border: 1.5px dashed var(--miao-line);
+  border-radius: 1rem;
+  background: var(--miao-paper-2);
+  padding: 2.4rem 1.5rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.8;
+  text-align: center;
+}
+
+/* 顶部导航 ---------------------------------------------------------------- */
+.miao-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 2px dashed rgba(47, 42, 36, 0.24);
+  background: rgba(251, 241, 220, 0.94);
+  color: var(--miao-ink);
+  backdrop-filter: blur(12px);
+}
+
+.miao-nav-inner {
+  display: flex;
+  width: 100%;
+  max-width: 1180px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 auto;
+  padding: 0.7rem 1.25rem;
+}
+
+.miao-brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--miao-ink);
+}
+
+.miao-brand-mark {
+  width: 1.9rem;
+  height: 1.9rem;
+  color: var(--miao-ink);
+}
+
+.miao-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.miao-brand-text strong {
+  font-family: var(--miao-display);
+  font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.miao-brand-text small {
+  margin-top: 0.24rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.miao-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.miao-nav-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.5rem 0.88rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.miao-nav-link:hover,
+.miao-nav-link.is-active {
+  background: var(--miao-butter);
+  color: var(--miao-ink);
+}
+
+.miao-menu-button {
+  display: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 999px;
+  background: var(--miao-paper-2);
+  color: var(--miao-ink);
+}
+
+.miao-mobile-menu {
+  display: none;
+  border-top: 2px dashed var(--miao-line);
+  background: var(--miao-paper);
+  padding: 0.8rem 1.25rem 1rem;
+}
+
+.miao-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.miao-mobile-link {
+  border-radius: 0.8rem;
+  padding: 0.7rem 0.8rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.miao-mobile-link.is-active,
+.miao-mobile-link:hover {
+  background: var(--miao-butter);
+  color: var(--miao-ink);
+}
+
+/* 页脚 -------------------------------------------------------------------- */
+.miao-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  border-top: 2px dashed var(--miao-line);
+  background: var(--miao-paper);
+  padding: 2.8rem 0 1.6rem;
+}
+
+.miao-footer-inner {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.miao-footer-grid {
+  display: grid;
+  grid-template-columns: 1.35fr repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.miao-footer-title {
+  font-family: var(--miao-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.miao-footer-title small {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.miao-footer-desc {
+  margin-top: 0.7rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.8;
+}
+
+.miao-footer-heading {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.miao-footer-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.84rem;
+}
+
+.miao-footer-list a:hover,
+.miao-footer-link:hover {
+  color: var(--miao-coral-ink);
+}
+
+.miao-footer-link {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.84rem;
+}
+
+.miao-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 2.2rem;
+  border-top: 1px dashed var(--miao-line);
+  padding-top: 1.1rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.63rem;
+}
+
+/* 首页 -------------------------------------------------------------------- */
+.miao-home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.22fr) minmax(15rem, 0.78fr);
+  gap: 1.8rem;
+  overflow: hidden;
+  border: 2px solid var(--miao-ink);
+  border-radius: 2rem 1.45rem 2.2rem 1.55rem;
+  background: var(--miao-paper-2);
+  box-shadow: 8px 9px 0 var(--miao-shadow);
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.miao-home-hero::before {
+  position: absolute;
+  top: -0.8rem;
+  left: 13%;
+  width: 8rem;
+  height: 1.7rem;
+  content: "";
+  background: rgba(242, 199, 92, 0.7);
+  transform: rotate(-2deg);
+  clip-path: polygon(3% 8%, 97% 0, 100% 90%, 0 100%);
+}
+
+.miao-home-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.miao-home-masthead {
+  margin-top: 0.7rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(3.5rem, 9.5vw, 7.2rem);
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  line-height: 0.95;
+  text-shadow: 4px 4px 0 rgba(242, 199, 92, 0.75);
+}
+
+.miao-home-tagline {
+  margin-top: 1.15rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(1.55rem, 3.6vw, 2.45rem);
+  font-weight: 800;
+  line-height: 1.28;
+}
+
+.miao-home-tagline span {
+  display: block;
+  color: var(--miao-coral-ink);
+}
+
+.miao-home-lede {
+  max-width: 36rem;
+  margin-top: 1rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.9;
+}
+
+.miao-search {
+  display: flex;
+  max-width: 35rem;
+  gap: 0.6rem;
+  margin-top: 1.35rem;
+}
+
+.miao-search-input {
+  min-width: 0;
+  flex: 1;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 999px;
+  background: var(--miao-paper);
+  padding: 0.8rem 1.1rem;
+  color: var(--miao-ink);
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.miao-search-input::placeholder {
+  color: rgba(109, 95, 77, 0.62);
+}
+
+.miao-search-input:focus {
+  box-shadow: 0 0 0 4px var(--miao-butter);
+}
+
+.miao-search-button {
+  flex: 0 0 auto;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 999px;
+  background: var(--miao-coral-ink);
+  padding: 0.8rem 1.2rem;
+  color: var(--miao-paper-2);
+  font-size: 0.86rem;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 rgba(47, 42, 36, 0.15);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.miao-search-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(47, 42, 36, 0.16);
+}
+
+.miao-home-art {
+  position: relative;
+  display: flex;
+  min-height: 18rem;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.miao-home-mascot {
+  width: min(18rem, 100%);
+  color: var(--miao-ink);
+  filter: drop-shadow(5px 7px 0 rgba(47, 42, 36, 0.12));
+  animation: miao-cat-breathe 4.5s ease-in-out infinite;
+}
+
+.miao-sticker {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 0.6rem;
+  padding: 0.38rem 0.65rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-hand);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 2px 2px 0 rgba(47, 42, 36, 0.12);
+}
+
+.miao-sticker--sun {
+  top: 4%;
+  left: 4%;
+  background: var(--miao-butter);
+  transform: rotate(-8deg);
+}
+
+.miao-sticker--mint {
+  top: 24%;
+  right: 2%;
+  background: var(--miao-mint-soft);
+  transform: rotate(7deg);
+}
+
+.miao-tape-note {
+  position: absolute;
+  right: 9%;
+  bottom: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(243, 167, 184, 0.55);
+  color: var(--miao-ink);
+  font-family: var(--miao-hand);
+  font-size: 0.95rem;
+  transform: rotate(-3deg);
+}
+
+@keyframes miao-cat-breathe {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(1deg);
+  }
+}
+
+.miao-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.miao-stat {
+  border: 1.5px solid var(--miao-line);
+  border-radius: 1rem;
+  background: var(--miao-paper-2);
+  padding: 1rem 1.1rem;
+  box-shadow: 3px 4px 0 rgba(86, 61, 29, 0.08);
+}
+
+.miao-stat strong {
+  display: block;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.miao-stat span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.miao-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.3rem;
+  margin-top: 2.6rem;
+}
+
+.miao-module-card {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--miao-ink);
+  border-radius: 1.5rem 1.15rem 1.7rem 1.25rem;
+  padding: 1.4rem 1.5rem 1.5rem;
+  box-shadow: 6px 7px 0 var(--miao-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.miao-module-card--mint {
+  background: var(--miao-mint-soft);
+  transform: rotate(-0.3deg);
+}
+
+.miao-module-card--coral {
+  background: var(--miao-coral-soft);
+  transform: rotate(0.3deg);
+}
+
+.miao-module-card:hover {
+  transform: translateY(-4px) rotate(0);
+  box-shadow: 8px 10px 0 rgba(86, 61, 29, 0.17);
+}
+
+.miao-module-kicker {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.miao-module-title {
+  margin-top: 0.55rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.miao-module-copy {
+  margin-top: 0.55rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.8;
+}
+
+.miao-module-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1.2rem;
+}
+
+.miao-module-count {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.miao-module-link {
+  color: var(--miao-ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.28em;
+}
+
+/* 作品卡片 ---------------------------------------------------------------- */
+.miao-game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.miao-game-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.miao-game-card {
+  position: relative;
+  display: flex;
+  min-height: 17.5rem;
+  flex-direction: column;
+  border: 2px solid var(--miao-ink);
+  border-radius: 1.1rem 1.35rem 1rem 1.4rem;
+  background: var(--miao-paper-2);
+  box-shadow: 5px 6px 0 var(--miao-shadow);
+  padding: 1.2rem;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.miao-game-card:nth-child(3n + 1) {
+  transform: rotate(-0.4deg);
+}
+
+.miao-game-card:nth-child(3n + 2) {
+  transform: rotate(0.35deg);
+}
+
+.miao-game-card:nth-child(3n) {
+  transform: rotate(-0.15deg);
+}
+
+.miao-game-card:hover {
+  transform: translateY(-5px) rotate(0);
+  box-shadow: 8px 10px 0 rgba(86, 61, 29, 0.17);
+}
+
+.miao-game-card-tape {
+  position: absolute;
+  top: -0.55rem;
+  left: 1.4rem;
+  width: 4rem;
+  height: 1.1rem;
+  background: rgba(243, 167, 184, 0.62);
+  transform: rotate(-4deg);
+}
+
+.miao-game-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.miao-game-card-kicker {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.miao-game-card-views {
+  flex: 0 0 auto;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.6rem;
+}
+
+.miao-game-card-title {
+  display: -webkit-box;
+  margin-top: 0.85rem;
+  overflow: hidden;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.miao-game-card-summary {
+  display: -webkit-box;
+  margin-top: 0.65rem;
+  overflow: hidden;
+  color: var(--miao-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.miao-game-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+}
+
+.miao-game-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.miao-game-card-link {
+  color: var(--miao-coral-ink);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.miao-game-card:hover .miao-game-card-link {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.25em;
+}
+
+.miao-game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 0.45rem;
+  background: var(--miao-butter);
+  padding: 0.22rem 0.45rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-hand);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transform: rotate(-2deg);
+}
+
+/* 页头 / 资料库 ------------------------------------------------------------ */
+.miao-page-head {
+  padding-top: 1.2rem;
+}
+
+.miao-page-head h1 {
+  margin-top: 0.55rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.miao-page-head p {
+  max-width: 42rem;
+  margin-top: 0.9rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.94rem;
+  line-height: 1.9;
+}
+
+.miao-filter-panel {
+  margin-top: 1.8rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.miao-filter-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12rem auto;
+  align-items: end;
+  gap: 0.9rem;
+}
+
+.miao-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.miao-field-label {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.miao-input,
+.miao-select {
+  width: 100%;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 0.8rem;
+  background: var(--miao-paper);
+  padding: 0.72rem 0.9rem;
+  color: var(--miao-ink);
+  font-size: 0.86rem;
+  outline: none;
+}
+
+.miao-input::placeholder {
+  color: rgba(109, 95, 77, 0.6);
+}
+
+.miao-input:focus,
+.miao-select:focus {
+  box-shadow: 0 0 0 3px var(--miao-butter);
+}
+
+.miao-filter-tags {
+  margin-top: 1rem;
+}
+
+.miao-archive-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+.miao-detail-tags {
+  margin-top: 0.9rem;
+}
+
+.miao-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2.2rem;
+}
+
+.miao-page-link {
+  display: inline-flex;
+  min-width: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 999px;
+  background: var(--miao-paper-2);
+  padding: 0.55rem 0.85rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.miao-page-link:hover {
+  border-color: var(--miao-ink);
+  color: var(--miao-ink);
+}
+
+.miao-page-link.is-active {
+  border-color: var(--miao-ink);
+  background: var(--miao-coral-ink);
+  color: var(--miao-paper-2);
+  box-shadow: 2px 2px 0 rgba(47, 42, 36, 0.16);
+}
+
+.miao-page-ellipsis {
+  padding: 0 0.2rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.8rem;
+}
+
+/* 作品详情 ---------------------------------------------------------------- */
+.miao-detail-container {
+  max-width: 1100px;
+}
+
+.miao-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding-top: 1rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.miao-breadcrumb a:hover {
+  color: var(--miao-coral);
+}
+
+.miao-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  min-width: 0;
+  align-items: start;
+  gap: 1.8rem;
+  margin-top: 1.2rem;
+}
+
+.miao-detail-grid > * {
+  min-width: 0;
+}
+
+.miao-article {
+  padding: clamp(1.25rem, 3.5vw, 2.3rem);
+}
+
+.miao-detail-kicker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.miao-detail-title {
+  margin-top: 0.9rem;
+  overflow-wrap: anywhere;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(1.75rem, 4.5vw, 2.9rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.miao-detail-section {
+  margin-top: 2rem;
+}
+
+.miao-detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.miao-detail-section-title h2 {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.miao-detail-section-mark {
+  display: inline-grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border-radius: 0.5rem;
+  background: var(--miao-butter);
+  color: var(--miao-ink);
+  font-size: 0.8rem;
+  transform: rotate(-8deg);
+}
+
+.miao-detail-text {
+  color: var(--miao-ink-soft);
+  font-size: 0.95rem;
+  line-height: 2;
+}
+
+.miao-detail-points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.miao-detail-points li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.miao-detail-points li::before {
+  position: absolute;
+  top: 0.65rem;
+  left: 0;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--miao-coral);
+  content: "";
+}
+
+.miao-detail-note {
+  margin-top: 1.2rem;
+  border-top: 1px dashed var(--miao-line);
+  padding-top: 0.9rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.8;
+}
+
+.miao-detail-note a {
+  color: var(--miao-coral-ink);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.24em;
+}
+
+.miao-detail-side {
+  position: sticky;
+  top: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.miao-review-teaser {
+  display: block;
+  padding: 1.1rem 1.15rem 1.2rem;
+  background: var(--miao-butter);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.miao-review-teaser:hover {
+  transform: translateY(-3px) rotate(-0.4deg);
+  box-shadow: 7px 8px 0 rgba(86, 61, 29, 0.17);
+}
+
+.miao-review-teaser-kicker {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.miao-review-teaser-title {
+  margin-top: 0.45rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.miao-review-teaser-verdict {
+  display: -webkit-box;
+  margin-top: 0.5rem;
+  overflow: hidden;
+  color: var(--miao-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.miao-review-stamp {
+  display: flex;
+  width: 5rem;
+  height: 5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--miao-ink);
+  border-radius: 999px;
+  background: var(--miao-paper-2);
+  color: var(--miao-coral);
+  font-family: var(--miao-mono);
+  transform: rotate(-6deg);
+}
+
+.miao-review-stamp strong {
+  font-family: var(--miao-display);
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.miao-review-stamp small {
+  margin-top: 0.1rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-hand);
+  font-size: 0.7rem;
+}
+
+.miao-review-teaser-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.miao-review-teaser-link {
+  color: var(--miao-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.26em;
+}
+
+.miao-review-invite {
+  padding: 1.1rem 1.15rem 1.2rem;
+  background: var(--miao-mint-soft);
+}
+
+.miao-review-invite h2 {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.miao-review-invite p {
+  margin-top: 0.4rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.miao-review-invite a {
+  display: inline-block;
+  margin-top: 0.7rem;
+  color: var(--miao-coral-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.26em;
+}
+
+.miao-facts {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.miao-facts h2 {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.miao-facts dl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.miao-facts dt {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+}
+
+.miao-facts dd {
+  margin-top: 0.08rem;
+  color: var(--miao-ink);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.miao-side-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.3rem;
+}
+
+.miao-side-mascot {
+  width: 3.4rem;
+  height: 3.4rem;
+  flex: 0 0 auto;
+  color: var(--miao-ink);
+}
+
+.miao-side-note p {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-hand);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+/* 下载 CTA ---------------------------------------------------------------- */
+.miao-download {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.6rem;
+  border: 2px solid var(--miao-ink);
+  border-radius: 1.4rem 1.1rem 1.5rem 1.2rem;
+  background: var(--miao-butter);
+  padding: 1rem 1.1rem 1.1rem;
+  box-shadow: 5px 6px 0 rgba(47, 42, 36, 0.18);
+}
+
+.miao-download-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.miao-download-button {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.65rem;
+  border: 2px solid var(--miao-ink);
+  border-radius: 1rem;
+  background: var(--miao-coral-ink);
+  padding: 0.85rem 1rem;
+  color: var(--miao-paper-2);
+  box-shadow: 4px 4px 0 rgba(47, 42, 36, 0.2);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.miao-download-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 rgba(47, 42, 36, 0.2);
+}
+
+.miao-download-icon {
+  position: relative;
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: rgba(255, 248, 234, 0.2);
+}
+
+.miao-download-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.miao-download-title {
+  display: block;
+  font-family: var(--miao-display);
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.miao-download-sub {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--miao-paper-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.miao-download-arrow {
+  display: flex;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 248, 234, 0.2);
+  font-size: 1.1rem;
+}
+
+.miao-download-title--sm {
+  font-size: 1.25rem;
+}
+
+.miao-download-note {
+  margin-top: 0.6rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.miao-mobile-cta {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  display: none;
+  border-top: 2px solid var(--miao-ink);
+  background: var(--miao-paper);
+  padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom));
+}
+
+.miao-mobile-cta .miao-download-button {
+  margin-top: 0;
+  padding: 0.65rem 0.75rem;
+}
+
+/* 收藏提示 ---------------------------------------------------------------- */
+.miao-bookmark {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  border: 2px dashed var(--miao-ink);
+  border-radius: 1.3rem;
+  background: var(--miao-paper-2);
+  padding: 1.2rem 1.3rem;
+}
+
+.miao-bookmark-title {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.miao-bookmark-desc {
+  max-width: 38rem;
+  margin-top: 0.3rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+.miao-bookmark-desc kbd {
+  border: 1px solid var(--miao-line);
+  border-radius: 0.3rem;
+  background: var(--miao-paper);
+  padding: 0.1rem 0.35rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-mono);
+  font-size: 0.68rem;
+}
+
+.miao-address {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 999px;
+  background: var(--miao-paper);
+  padding: 0.45rem 0.8rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-mono);
+  font-size: 0.74rem;
+}
+
+.miao-address:hover {
+  border-color: var(--miao-ink);
+}
+
+.miao-address-hint {
+  color: var(--miao-ink-soft);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+.miao-bookmark--footer {
+  display: block;
+  margin-top: 0.8rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.miao-bookmark--footer .miao-bookmark-title {
+  font-family: var(--miao-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.miao-bookmark--footer .miao-bookmark-desc {
+  font-size: 0.8rem;
+}
+
+/* 法务 / 说明页 ------------------------------------------------------------ */
+.miao-legal {
+  margin-top: 1.6rem;
+  padding: clamp(1.3rem, 4vw, 2.4rem);
+}
+
+.miao-legal p,
+.miao-legal li {
+  color: var(--miao-ink-soft);
+  font-size: 0.94rem;
+  line-height: 2;
+}
+
+.miao-legal p + p {
+  margin-top: 0.9rem;
+}
+
+.miao-legal h2 {
+  margin-top: 1.8rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.miao-legal h2:first-child {
+  margin-top: 0;
+}
+
+.miao-legal ul {
+  margin-top: 0.6rem;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.miao-legal li + li {
+  margin-top: 0.35rem;
+}
+
+.miao-legal strong {
+  color: var(--miao-ink);
+}
+
+.miao-legal-meta {
+  margin-top: 0.55rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.68rem;
+}
+
+/* 404 / 错误页 / 加载 ------------------------------------------------------ */
+.miao-error-page {
+  display: flex;
+  min-height: 70vh;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+.miao-error-card {
+  max-width: 44rem;
+  padding: clamp(1.5rem, 4vw, 2.6rem);
+  text-align: center;
+}
+
+.miao-error-code {
+  color: var(--miao-coral);
+  font-family: var(--miao-display);
+  font-size: clamp(4.5rem, 13vw, 8rem);
+  font-weight: 900;
+  line-height: 0.9;
+  text-shadow: 4px 4px 0 var(--miao-butter);
+}
+
+.miao-error-title {
+  margin-top: 0.8rem;
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+}
+
+.miao-error-copy {
+  max-width: 34rem;
+  margin: 0.7rem auto 0;
+  color: var(--miao-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.9;
+}
+
+.miao-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: 1.4rem;
+}
+
+.miao-error-note {
+  margin-top: 1rem;
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.65rem;
+}
+
+.miao-error-mascot {
+  width: 7.5rem;
+  margin: 0 auto 0.3rem;
+  color: var(--miao-ink);
+  animation: miao-cat-breathe 4.5s ease-in-out infinite;
+}
+
+.miao-loading {
+  display: flex;
+  min-height: 60vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.miao-loading-mascot {
+  width: 7rem;
+  color: var(--miao-ink);
+  animation: miao-cat-breathe 4.5s ease-in-out infinite;
+}
+
+.miao-loading-text {
+  color: var(--miao-ink-soft);
+  font-family: var(--miao-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+}
+
+/* 下载按钮小动效（只动 transform / opacity，不触发布局） ------------------- */
 @keyframes cta-arrow-bob {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(-1px);
   }
-  45%,
-  55% {
+  45%, 55% {
     transform: translateY(2.5px);
   }
 }
@@ -131,31 +1691,28 @@ a {
   0% {
     transform: translateX(-180%) skewX(-18deg);
   }
-  60%,
-  100% {
+  60%, 100% {
     transform: translateX(340%) skewX(-18deg);
   }
 }
 
 @keyframes cta-halo-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(9, 11, 16, 0.18);
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(47, 42, 36, 0.16);
   }
   50% {
-    box-shadow: 0 0 0 7px rgba(9, 11, 16, 0);
+    box-shadow: 0 0 0 7px rgba(47, 42, 36, 0);
   }
 }
 
 @keyframes cta-dot-breathe {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(214, 169, 107, 0.55);
+    box-shadow: 0 0 0 0 rgba(232, 104, 82, 0.5);
   }
   50% {
     opacity: 0.72;
-    box-shadow: 0 0 0 5px rgba(214, 169, 107, 0);
+    box-shadow: 0 0 0 5px rgba(232, 104, 82, 0);
   }
 }
 
@@ -169,6 +1726,11 @@ a {
 }
 
 .cta-live-dot {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--miao-coral);
   animation: cta-dot-breathe 2.1s ease-in-out infinite;
 }
 
@@ -185,18 +1747,195 @@ a {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 40%;
+  width: 30%;
   pointer-events: none;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.16),
     transparent
   );
   animation: cta-shine-sweep 4.4s ease-in-out infinite;
 }
 
+/* 响应式 ------------------------------------------------------------------ */
+@media (max-width: 1000px) {
+  .miao-game-grid,
+  .miao-game-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .miao-footer-grid {
+    grid-template-columns: 1.2fr repeat(2, 1fr);
+  }
+
+  .miao-footer-grid > :nth-child(4) {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .miao-nav-links {
+    display: none;
+  }
+
+  .miao-menu-button {
+    display: flex;
+  }
+
+  .miao-mobile-menu {
+    display: block;
+  }
+
+  .miao-home-hero {
+    grid-template-columns: 1fr;
+    padding: 1.4rem;
+  }
+
+  .miao-home-art {
+    min-height: 13rem;
+    order: -1;
+  }
+
+  .miao-home-mascot {
+    width: 13rem;
+  }
+
+  .miao-sticker--sun {
+    top: 0;
+    left: 6%;
+  }
+
+  .miao-sticker--mint {
+    top: 10%;
+    right: 4%;
+  }
+
+  .miao-tape-note {
+    right: 8%;
+    bottom: 0;
+  }
+
+  .miao-stat-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .miao-stat {
+    padding: 0.8rem;
+  }
+
+  .miao-stat strong {
+    font-size: 1.4rem;
+  }
+
+  .miao-module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .miao-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  .miao-filter-form {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .miao-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .miao-detail-side {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .miao-side-note {
+    display: none;
+  }
+
+  .miao-detail-page {
+    padding-bottom: 5.2rem;
+  }
+
+  .miao-mobile-cta {
+    display: block;
+  }
+
+  .miao-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .miao-footer-grid > :nth-child(4) {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .miao-container {
+    padding: 1.4rem 1rem 4rem;
+  }
+
+  .miao-home-masthead {
+    font-size: clamp(3rem, 17vw, 4.6rem);
+  }
+
+  .miao-home-tagline {
+    font-size: 1.5rem;
+  }
+
+  .miao-search {
+    flex-direction: column;
+  }
+
+  .miao-search-button {
+    width: 100%;
+  }
+
+  .miao-stat-row {
+    grid-template-columns: 1fr;
+  }
+
+  .miao-game-grid,
+  .miao-game-grid--4 {
+    grid-template-columns: 1fr;
+  }
+
+  .miao-detail-side {
+    grid-template-columns: 1fr;
+  }
+
+  .miao-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .miao-footer-bottom {
+    flex-direction: column;
+  }
+
+  .miao-bookmark {
+    align-items: flex-start;
+  }
+
+  .miao-error-actions {
+    flex-direction: column;
+  }
+
+  .miao-error-actions .miao-btn {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .miao-home-mascot,
+  .miao-error-mascot,
+  .miao-loading-mascot,
   .cta-icon-arrow,
   .cta-icon-halo,
   .cta-live-dot,
@@ -207,4 +1946,135 @@ a {
   .cta-shine {
     display: none;
   }
+
+  .miao-game-card,
+  .miao-game-card:hover,
+  .miao-module-card,
+  .miao-module-card:hover,
+  .miao-review-teaser,
+  .miao-review-teaser:hover,
+  .miao-btn,
+  .miao-search-button,
+  .miao-download-button {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* 首页使用说明 ------------------------------------------------------------ */
+.miao-howto {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 1.5rem;
+  margin-top: 3.2rem;
+  padding: clamp(1.3rem, 3.5vw, 2rem);
+}
+
+.miao-howto-copy .miao-section-desc {
+  margin-top: 0.7rem;
+}
+
+.miao-howto-grid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.miao-howto-step {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  column-gap: 0.7rem;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 0.8rem;
+  background: var(--miao-paper);
+  padding: 0.85rem 0.9rem;
+}
+
+.miao-howto-num {
+  grid-row: span 2;
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border: 1.5px solid var(--miao-ink);
+  border-radius: 999px;
+  background: var(--miao-butter);
+  color: var(--miao-ink);
+  font-family: var(--miao-mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.miao-howto-step h3 {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.miao-howto-step p {
+  grid-column: 2;
+  margin-top: 0.2rem;
+  color: var(--miao-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+@media (max-width: 820px) {
+  .miao-howto {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 相似条目 ---------------------------------------------------------------- */
+.miao-related {
+  margin-top: 2.2rem;
+  padding: 1.2rem 1.3rem 1.3rem;
+}
+
+.miao-related-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.miao-related-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1.5px solid var(--miao-line);
+  border-radius: 0.8rem;
+  background: var(--miao-paper);
+  padding: 0.8rem 0.9rem;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.miao-related-link:hover {
+  border-color: var(--miao-ink);
+  transform: translateY(-2px);
+}
+
+.miao-related-link h3 {
+  color: var(--miao-ink);
+  font-family: var(--miao-display);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.miao-related-link p {
+  display: -webkit-box;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  color: var(--miao-ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.miao-related-meta {
+  flex: 0 0 auto;
+  color: var(--miao-coral-ink);
+  font-family: var(--miao-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
 }

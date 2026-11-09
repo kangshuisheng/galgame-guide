@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
 
 import "@/app/globals.css";
-import { BookmarkHint } from "@/components/bookmark-hint";
 import { Navbar } from "@/components/navbar";
-import { analytics, buildGoPath, siteConfig } from "@/lib/config";
+import { SiteFooter } from "@/components/site-footer";
+import { analytics, reviewBrand, siteConfig } from "@/lib/config";
 import { OG_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -17,8 +16,10 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
+    "旮旯喵评",
     "Galgame Guide",
     "Galgame 索引",
+    reviewBrand.name,
     "Galgame 品鉴",
     "Galgame 评测",
     "Galgame 评分",
@@ -27,6 +28,9 @@ export const metadata: Metadata = {
     "游戏版本情报",
     "视觉小说",
   ],
+  icons: {
+    icon: [{ url: "/review-cat.svg", type: "image/svg+xml" }],
+  },
   // canonical 不在这里写：layout 的值会被所有没覆盖的子页继承，
   // 2026-11-05 审计实测 /about /contact /privacy /terms 四页因此全部指向首页，
   // 等于让搜索引擎把它们当成首页副本。canonical 一律由各页自己声明。
@@ -71,83 +75,6 @@ export const metadata: Metadata = {
   },
 };
 
-function Footer() {
-  return (
-    <footer className="mt-auto border-t border-white/10 bg-black/40 py-12 backdrop-blur-sm">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-4">
-            <h3 className="font-display text-xl text-ink-strong">{siteConfig.name}</h3>
-            <p className="text-sm leading-6 text-ink-soft">
-              收录 Galgame 与视觉小说的作品资料，帮你在下载之前先看清楚是什么游戏。
-            </p>
-            <BookmarkHint variant="footer" />
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-white/40">快速导航</h4>
-            <ul className="grid gap-2 text-sm text-ink-soft">
-              <li><Link href="/" className="hover:text-accent">网站首页</Link></li>
-              <li><Link href="/archive" className="hover:text-accent">全部作品</Link></li>
-              <li><Link href="/review" className="hover:text-accent">Galgame 品鉴</Link></li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-white/40">关于与合规</h4>
-            <ul className="grid gap-2 text-sm text-ink-soft">
-              <li><Link href="/about" className="hover:text-accent">关于我们</Link></li>
-              <li><Link href="/privacy" className="hover:text-accent">隐私政策</Link></li>
-              <li><Link href="/terms" className="hover:text-accent">服务条款</Link></li>
-              <li><Link href="/contact" className="hover:text-accent">免责声明</Link></li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-white/40">合作伙伴</h4>
-            <p className="text-sm text-ink-soft">
-              本站只整理资料，不存游戏文件。下载请到资源站。
-            </p>
-            <a
-              href={buildGoPath("site")}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              referrerPolicy="no-referrer"
-              className="inline-flex text-sm text-accent hover:underline"
-            >
-              KrzACG 社区 ↗
-            </a>
-            {/* 这两个卫星站长期没有外部入链，Bing 的 AnchorCount 是 0、从未被发现。
-                页脚 follow 链接是它们的发现路径：不要加 nofollow，也不要删。 */}
-            <ul className="grid gap-2 text-sm text-ink-soft">
-              <li>
-                <a
-                  href="https://gal.krzvv.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent"
-                >
-                  Galgame 备用入口 ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://collection.krzvv.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent"
-                >
-                  Galgame 合集榜 ↗
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-12 border-t border-white/5 pt-8 text-center text-xs text-white/30">
-          <p>© {new Date().getFullYear()} Galgame Guide. All Rights Reserved.</p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -155,10 +82,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="flex min-h-screen flex-col">
+      <body className="site-body flex min-h-screen flex-col">
         <Navbar />
         {children}
-        <Footer />
+        <SiteFooter />
         {/* 用 afterInteractive 而不是 lazyOnload：这个站的价值就是回答
             「Bing 来的流量到底有没有点下载」，脚本在 lazyOnload 下会等到
             所有资源加载完才跑，用户看完就走的话根本不上报 —— 2026-10-31

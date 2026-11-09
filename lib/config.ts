@@ -8,10 +8,28 @@ const defaultSiteUrl = vercelHost ? `https://${vercelHost}` : "http://localhost:
 
 const stripTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
-export const siteConfig = {
-  name: "Galgame Guide",
+/**
+ * 旮旯喵评的站点品牌。
+ *
+ * 一个项目只保留一套对外品牌：旮旯喵评（Galgame Guide）。
+ * 「资料库」和「喵评」是同一品牌下的两个模块，共用纸页视觉与导航；
+ * 不再把 review 当成独立子站，也不让两种 UI 各说各话。
+ */
+export const reviewBrand = {
+  name: "旮旯喵评",
+  english: "GALGAME MEOW REVIEW",
+  tagline: "猫猫先替你玩一遍，再告诉你值不值得。",
   description:
-    "收录 3800 多部 Galgame 与视觉小说，可按作品名、类型、平台和语言查找。每部都有简介、类型标签、版本和更新时间。",
+    "旮旯喵评是 Galgame 与视觉小说的推荐评测栏目：不写攻略，只给结论，按剧情、角色、音乐、美术、系统五个维度打分。",
+  editorialTeam: "旮旯喵评编辑部",
+} as const;
+
+export const siteConfig = {
+  name: "旮旯喵评",
+  englishName: "Galgame Guide",
+  tagline: "猫猫先替你查清楚，再告诉你值不值得玩。",
+  description:
+    "旮旯喵评（Galgame Guide）收录 3800 多部 Galgame 与视觉小说，可按作品名、类型、平台和语言查找；下设资料库与喵评两个模块。",
   siteUrl: stripTrailingSlash(
     process.env.NEXT_PUBLIC_SITE_URL ?? defaultSiteUrl
   ),

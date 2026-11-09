@@ -6,9 +6,11 @@ import type { ReactNode } from "react";
 import { BookmarkHint } from "@/components/bookmark-hint";
 import { MainSiteCta, MobileStickyCta } from "@/components/main-site-cta";
 import { RelatedGames } from "@/components/related-games";
+import { CatMascot } from "@/components/review/cat-mascot";
 import { buildGoPath } from "@/lib/config";
 import { getAllGames, getAllSlugs, getGameBySlug } from "@/lib/games";
 import { getRelatedGames } from "@/lib/related-games";
+import { getReviewForGame } from "@/lib/review/reviews";
 import {
   buildCanonicalPath,
   buildGameDescription,
@@ -54,7 +56,7 @@ export async function generateMetadata({
   const canonical = buildCanonicalPath(game.slug);
 
   return {
-    // absolute 绕开 layout 的 `%s | Galgame Guide` 模板：作品名长度不可控，
+    // absolute 绕开 layout 的 `%s | 旮旯喵评` 模板：作品名长度不可控，
     // 交给 buildGameTitle 自己决定要不要带品牌后缀，才能保证不超过 70 字符。
     title: { absolute: title },
     description,
@@ -91,11 +93,9 @@ function formatDate(value: string) {
  */
 function SectionHeading({ children }: { children: ReactNode }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="h-2 w-2 rounded-full bg-accent" />
-      <h2 className="font-display text-xl tracking-[0.08em] text-ink-strong">
-        {children}
-      </h2>
+    <div className="miao-detail-section-title">
+      <span className="miao-detail-section-mark" aria-hidden="true">✦</span>
+      <h2>{children}</h2>
     </div>
   );
 }
@@ -113,123 +113,145 @@ export default async function GamePage({
 
   if (!game) notFound();
 
+  const review = await getReviewForGame(game.slug, game.title);
   const relatedGames = getRelatedGames(game, allGames);
   const jsonLd = buildGameStructuredData(game);
 
   return (
-    <main className="shell">
+    <main className="miao-page miao-detail-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-5 pt-8 pb-28 sm:px-8 sm:pb-8 lg:px-12">
-        <nav className="flex flex-wrap items-center gap-3 text-sm text-white/55">
-          <Link href="/" className="transition hover:text-ink-strong">
-            首页
-          </Link>
-          <span>/</span>
-          <Link href="/archive" className="transition hover:text-ink-strong">
-            全部作品
-          </Link>
-          <span>/</span>
-          <span className="line-clamp-1 text-ink-strong">{game.title}</span>
+      <div className="miao-container miao-detail-container">
+        <nav className="miao-breadcrumb" aria-label="面包屑">
+          <Link href="/">首页</Link>
+          <span aria-hidden="true">/</span>
+          <Link href="/archive">资料库</Link>
+          <span aria-hidden="true">/</span>
+          <span>{game.title}</span>
         </nav>
 
-        <article className="rounded-[2.5rem] border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-6 shadow-[0_40px_120px_rgba(0,0,0,0.35)] sm:p-8 lg:p-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="eyebrow">作品资料</span>
-            <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/50">
-              资料整理自开发商与发行方公开信息
-            </span>
-          </div>
-
-          <h1 className="mt-6 font-display text-3xl leading-tight text-ink-strong sm:text-4xl lg:text-5xl">
-            {game.title}
-          </h1>
-
-          <section className="mt-8">
-            <SectionHeading>作品简介</SectionHeading>
-
-            {game.aiIntro || game.summary ? (
-              <p className="mt-4 text-base leading-8 text-ink-soft sm:text-lg">
-                {game.aiIntro ?? game.summary}
-              </p>
-            ) : null}
-
-            {game.aiPoints.length > 0 && (
-              <ul className="mt-4 space-y-2 text-sm leading-7 text-ink-soft">
-                {game.aiPoints.map((point) => (
-                  <li key={point} className="flex gap-2.5">
-                    <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <MainSiteCta sourceId={game.sourceId} title={game.title} />
-
-          {game.tags.length > 0 && (
-            <section className="mt-8">
-              <SectionHeading>类型标签</SectionHeading>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {game.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/archive?tag=${encodeURIComponent(tag)}`}
-                    className="rounded-full border border-white/10 px-3 py-1 text-xs tracking-[0.12em] text-white/75 transition hover:border-accent/55 hover:text-accent"
-                  >
-                    {tag}
-                  </Link>
-                ))}
+        <div className="miao-detail-grid">
+          <article className="miao-paper miao-article">
+            <header>
+              <div className="miao-detail-kicker-row">
+                <span className="miao-kicker">
+                  <span className="miao-kicker-dot" aria-hidden="true" />
+                  作品资料
+                </span>
+                <span className="miao-chip">资料整理自开发商与发行方公开信息</span>
               </div>
+
+              <h1 className="miao-detail-title">{game.title}</h1>
+            </header>
+
+            <section className="miao-detail-section">
+              <SectionHeading>作品简介</SectionHeading>
+
+              {game.aiIntro || game.summary ? (
+                <p className="miao-detail-text">
+                  {game.aiIntro ?? game.summary}
+                </p>
+              ) : null}
+
+              {game.aiPoints.length > 0 && (
+                <ul className="miao-detail-points">
+                  {game.aiPoints.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              )}
             </section>
-          )}
 
-          <section className="mt-8">
-            <SectionHeading>收录信息</SectionHeading>
+            <MainSiteCta sourceId={game.sourceId} title={game.title} />
 
-            <dl className="mt-4 grid gap-4 sm:grid-cols-3">
-              {[
-                ["热度", game.views.toLocaleString()],
-                ["首次收录", formatDate(game.createdAt)],
-                ["资料更新", formatDate(game.updatedAt)],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-3xl border border-white/10 bg-black/20 p-4"
-                >
-                  <dt className="text-xs uppercase tracking-[0.2em] text-white/45">
-                    {label}
-                  </dt>
-                  <dd className="mt-2 text-sm text-ink-strong">{value}</dd>
+            {game.tags.length > 0 && (
+              <section className="miao-detail-section">
+                <SectionHeading>类型标签</SectionHeading>
+
+                <div className="miao-tag-row miao-detail-tags">
+                  {game.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/archive?tag=${encodeURIComponent(tag)}`}
+                      className="miao-tag"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </dl>
+              </section>
+            )}
 
-            <p className="mt-4 text-sm leading-7 text-white/45">
-              作品名称、简介与版本信息整理自开发商、发行方和商店页面的公开资料。
-              发现错漏，欢迎到{" "}
-              <a
-                href={buildGoPath("site")}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                referrerPolicy="no-referrer"
-                className="text-accent hover:underline"
-              >
-                KrzACG 社区
-              </a>{" "}
-              告诉我们。
-            </p>
-          </section>
+            <section className="miao-detail-section">
+              <SectionHeading>关于这份资料</SectionHeading>
+              <p className="miao-detail-note">
+                作品名称、简介与版本信息整理自开发商、发行方和商店页面的公开资料。
+                发现错漏，欢迎到{" "}
+                <a
+                  href={buildGoPath("site")}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  referrerPolicy="no-referrer"
+                >
+                  KrzACG 社区
+                </a>{" "}
+                告诉我们。
+              </p>
+            </section>
+          </article>
 
-        </article>
+          <aside className="miao-detail-side" aria-label="喵评与作品信息">
+            {review ? (
+              <Link href={`/review/${review.slug}`} className="miao-paper miao-review-teaser">
+                <span className="miao-review-teaser-kicker">旮旯喵评 · 猫猫评过</span>
+                <h2 className="miao-review-teaser-title">{review.reviewTitle}</h2>
+                <p className="miao-review-teaser-verdict">{review.verdict}</p>
+                <div className="miao-review-teaser-row">
+                  <span className="miao-review-stamp">
+                    <strong>{review.overall.toFixed(1)}</strong>
+                    <small>喵评</small>
+                  </span>
+                  <span className="miao-review-teaser-link">打开完整喵评 →</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="miao-paper miao-review-invite">
+                <h2>这部还没写喵评</h2>
+                <p>猫猫还在排队玩。先去喵评本看看已经评过的作品吧。</p>
+                <Link href="/review">去喵评本翻翻 →</Link>
+              </div>
+            )}
 
-        <BookmarkHint />
+            <section className="miao-paper miao-facts">
+              <h2>收录信息</h2>
+              <dl>
+                <div>
+                  <dt>热度</dt>
+                  <dd>{game.views.toLocaleString()}</dd>
+                </div>
+                <div>
+                  <dt>首次收录</dt>
+                  <dd>{formatDate(game.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt>资料更新</dt>
+                  <dd>{formatDate(game.updatedAt)}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <div className="miao-side-note">
+              <CatMascot className="miao-side-mascot" />
+              <p>资料看清楚了，再决定要不要点下载。</p>
+            </div>
+          </aside>
+        </div>
 
         <RelatedGames games={relatedGames} />
+
+        <BookmarkHint />
       </div>
 
       <MobileStickyCta sourceId={game.sourceId} />

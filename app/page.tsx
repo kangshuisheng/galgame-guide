@@ -3,9 +3,10 @@ import Link from "next/link";
 
 import { BookmarkHint } from "@/components/bookmark-hint";
 import { GameCard } from "@/components/game-card";
+import { CatMascot } from "@/components/review/cat-mascot";
 import { siteConfig } from "@/lib/config";
 import { getAllGames, getFeaturedGames, getTopTags } from "@/lib/games";
-import { getReviewCount } from "@/lib/review/reviews";
+import { getAllReviews } from "@/lib/review/reviews";
 import {
   buildCanonicalPath,
   buildHomeDescription,
@@ -33,12 +34,20 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [featuredGames, allGames, topTags] = await Promise.all([
+  const [featuredGames, allGames, topTags, reviews] = await Promise.all([
     getFeaturedGames(6),
     getAllGames(),
     getTopTags(10),
+    getAllReviews(),
   ]);
-  const reviewCount = await getReviewCount();
+  const reviewCount = reviews.length;
+  const topReview = [...reviews].sort((left, right) => right.overall - left.overall)[0];
+  const reviewByGuide = new Map(
+    reviews
+      .filter((review) => review.guideSlug)
+      .map((review) => [review.guideSlug as string, review]),
+  );
+  const reviewByTitle = new Map(reviews.map((review) => [review.title, review]));
 
   // Sort by updatedAt for recent list
   const recentGames = [...allGames]
@@ -70,47 +79,45 @@ export default async function HomePage() {
   };
 
   return (
-    <main className="shell">
+    <main className="miao-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-16 px-5 py-8 sm:px-8 lg:px-12">
-        <header className="grid gap-8 rounded-[2.5rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-7 shadow-[0_40px_120px_rgba(0,0,0,0.38)] backdrop-blur lg:grid-cols-[1.25fr_0.75fr] lg:p-10">
-          <div className="space-y-7">
-            <span className="eyebrow">Galgame · 视觉小说</span>
-            <div className="space-y-5">
-              <h1 className="max-w-4xl font-display text-5xl leading-none text-ink-strong sm:text-6xl lg:text-7xl">
-                {allGames.length} 部 Galgame 和视觉小说，
-                <span className="block text-accent">
-                  想玩哪部，先在这儿查清楚。
-                </span>
-              </h1>
-              <p className="max-w-2xl text-base leading-8 text-ink-soft sm:text-lg">
-                搜作品名、题材或平台，能看到简介、类型标签、版本和更新时间。
-                找到想玩的，一键跳到下载页。
-              </p>
-            </div>
+      <div className="miao-container">
+        <header className="miao-home-hero">
+          <div className="miao-home-copy">
+            <span className="miao-kicker">
+              <span className="miao-kicker-dot" aria-hidden="true" />
+              GALGAME GUIDE · 猫猫资料库
+            </span>
+            <h1 className="miao-home-masthead">旮旯喵评</h1>
+            <p className="miao-home-tagline">
+              猫猫先替你查清楚，
+              <span>再告诉你值不值得玩。</span>
+            </p>
+            <p className="miao-home-lede">
+              收录 {allGames.length} 部 Galgame 与视觉小说。资料库里查简介、类型、平台和版本，
+              喵评里看猫猫的结论、亮点、不足和适合谁——一个站，一条线走完。
+            </p>
 
-            <form action="/archive" method="get" className="flex max-w-2xl flex-col gap-3 sm:flex-row">
+            <form action="/archive" method="get" className="miao-search">
               <label className="sr-only" htmlFor="home-grid-search">搜索作品</label>
               <input
                 id="home-grid-search"
                 name="q"
                 placeholder="搜作品名、题材或平台"
-                className="min-w-0 flex-1 rounded-full border border-white/12 bg-black/25 px-5 py-3 text-sm text-ink-strong outline-none placeholder:text-white/35 focus:border-accent/70"
+                className="miao-search-input"
               />
-              <button className="rounded-full bg-accent px-6 py-3 text-sm font-semibold tracking-[0.12em] text-black transition hover:bg-accent-strong">
-                搜作品
-              </button>
+              <button className="miao-search-button">搜作品</button>
             </form>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="miao-tag-row" aria-label="热门标签">
               {topTags.map((item) => (
                 <Link
                   key={item.name}
                   href={`/archive?tag=${encodeURIComponent(item.name)}`}
-                  className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/65 transition hover:border-accent/50 hover:text-accent"
+                  className="miao-tag"
                 >
                   {item.name} · {item.count}
                 </Link>
@@ -118,99 +125,102 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <aside className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            {[
-              [`${allGames.length}`, "部作品"],
-              ["每天", "有新作品进来"],
-              ["免费", "不用注册"],
-            ].map(([value, label]) => (
-              <div
-                key={label}
-                className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5"
-              >
-                <p className="font-display text-3xl text-ink-strong">{value}</p>
-                <p className="mt-2 text-xs tracking-[0.18em] text-white/45">
-                  {label}
-                </p>
-              </div>
-            ))}
-          </aside>
+          <div className="miao-home-art">
+            <span className="miao-sticker miao-sticker--sun">猫猫认证</span>
+            <span className="miao-sticker miao-sticker--mint">认真查资料</span>
+            <CatMascot className="miao-home-mascot" />
+            <span className="miao-tape-note">今天也在整理档案</span>
+          </div>
         </header>
 
-        <Link
-          href="/review"
-          className="group grid gap-6 rounded-[2.5rem] border border-accent/20 bg-[linear-gradient(135deg,rgba(214,169,107,0.12),rgba(214,169,107,0.025))] p-6 transition hover:border-accent/55 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center"
-        >
-          <div className="space-y-3">
-            <span className="eyebrow">Galgame 品鉴</span>
-            <h2 className="font-display text-4xl text-ink-strong group-hover:text-accent">
-              不写攻略，只告诉你值不值得玩。
-            </h2>
-            <p className="max-w-2xl text-sm leading-7 text-ink-soft">
-              按剧情、角色、音乐、美术、系统五个维度打分。结论、亮点、不足和适合谁，
-              一次讲清楚。目前已品鉴 {reviewCount} 部。
-            </p>
+        <section className="miao-stat-row" aria-label="站点数据">
+          <div className="miao-stat">
+            <strong>{allGames.length}</strong>
+            <span>部作品资料</span>
           </div>
-          <span className="inline-flex rounded-full bg-accent px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-accent-strong">
-            进入品鉴 →
-          </span>
-        </Link>
+          <div className="miao-stat">
+            <strong>{reviewCount}</strong>
+            <span>篇猫猫喵评</span>
+          </div>
+          <div className="miao-stat">
+            <strong>每天</strong>
+            <span>持续收录更新</span>
+          </div>
+        </section>
 
-        <section id="hot-list" className="space-y-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-3">
-              <span className="eyebrow">热门</span>
-              <h2 className="font-display text-4xl text-ink-strong">
-                大家都在看
-              </h2>
+        <section className="miao-module-grid" aria-label="站点模块">
+          <Link href="/archive" className="miao-module-card miao-module-card--mint">
+            <span className="miao-module-kicker">GALGAME GUIDE · 资料库</span>
+            <h2 className="miao-module-title">先把作品查明白</h2>
+            <p className="miao-module-copy">
+              简介、类型、平台、语言、版本和更新时间，一部作品一页档案。
+              找到想玩的，再跳去下载页。
+            </p>
+            <div className="miao-module-foot">
+              <span className="miao-module-count">{allGames.length} 部作品</span>
+              <span className="miao-module-link">进入资料库 →</span>
             </div>
-            <Link
-              href="/archive"
-              className="text-sm font-semibold tracking-[0.1em] text-accent hover:underline"
-            >
+          </Link>
+
+          <Link href="/review" className="miao-module-card miao-module-card--coral">
+            <span className="miao-module-kicker">GALGAME MEOW REVIEW · 喵评</span>
+            <h2 className="miao-module-title">再看猫猫怎么评</h2>
+            <p className="miao-module-copy">
+              剧情、角色、音乐、美术、系统五维打分。先看结论，再看它适不适合你。
+              {topReview ? ` 本期最高分是《${topReview.title}》${topReview.overall.toFixed(1)} 分。` : ""}
+            </p>
+            <div className="miao-module-foot">
+              <span className="miao-module-count">{reviewCount} 篇喵评</span>
+              <span className="miao-module-link">翻喵评本 →</span>
+            </div>
+          </Link>
+        </section>
+
+        <section id="hot-list" className="miao-section">
+          <div className="miao-section-head">
+            <div>
+              <span className="miao-kicker">热门 · 资料库</span>
+              <h2 className="miao-section-title">大家都在看</h2>
+            </div>
+            <Link href="/archive" className="miao-section-link">
               看全部作品 →
             </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="miao-game-grid">
             {featuredGames.map((game) => (
-              <GameCard key={game.slug} game={game} />
+              <GameCard key={game.slug} game={game} review={reviewByGuide.get(game.slug) ?? reviewByTitle.get(game.title)} />
             ))}
           </div>
         </section>
 
-        <section className="space-y-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-3">
-              <span className="eyebrow">新收录</span>
-              <h2 className="font-display text-4xl text-ink-strong">
-                最近收录
-              </h2>
+        <section className="miao-section">
+          <div className="miao-section-head">
+            <div>
+              <span className="miao-kicker">新收录 · 资料库</span>
+              <h2 className="miao-section-title">最近收录</h2>
             </div>
-            <p className="max-w-xl text-sm leading-7 text-white/55">
+            <p className="miao-section-desc">
               每天同步新作品，刚进来的会排在这里。
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="miao-game-grid miao-game-grid--4">
             {recentGames.map((game) => (
-              <GameCard key={game.slug} game={game} />
+              <GameCard key={game.slug} game={game} review={reviewByGuide.get(game.slug) ?? reviewByTitle.get(game.title)} />
             ))}
           </div>
         </section>
 
-        <section className="grid gap-6 rounded-[2.5rem] border border-white/10 bg-black/20 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-5">
-            <span className="eyebrow">怎么用</span>
-            <h2 className="font-display text-4xl text-ink-strong">
-              三步找到想玩的
-            </h2>
-            <p className="text-base leading-8 text-ink-soft">
+        <section className="miao-howto miao-paper">
+          <div className="miao-howto-copy">
+            <span className="miao-kicker">怎么用</span>
+            <h2 className="miao-section-title">三步找到想玩的</h2>
+            <p className="miao-section-desc">
               这里只放作品资料和下载入口，不放游戏文件。查资料、看类型、去下载，一条线走完。
             </p>
           </div>
-
-          <div className="grid gap-4">
+          <div className="miao-howto-grid">
             {[
               {
                 title: "搜作品名",
@@ -218,30 +228,17 @@ export default async function HomePage() {
               },
               {
                 title: "看简介和标签",
-                body: "什么类型、哪个平台、什么版本、多久更新过，都写在页面上。",
+                body: "什么类型、哪个平台、什么版本、多久更新过，都写在页面上。有喵评的还能直接看评分。",
               },
               {
                 title: "去下载页",
-                body: "点页面中间金色的 Download 按钮，跳到下载页面。本站不存游戏文件。",
+                body: "点页面中间珊瑚色的 Download 按钮，跳到下载页面。本站不存游戏文件。",
               },
             ].map((item, index) => (
-              <article
-                key={item.title}
-                className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-display text-lg text-accent">
-                    0{index + 1}
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="font-display text-2xl text-ink-strong">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm leading-7 text-ink-soft sm:text-[15px]">
-                      {item.body}
-                    </p>
-                  </div>
-                </div>
+              <article key={item.title} className="miao-howto-step">
+                <span className="miao-howto-num">0{index + 1}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
               </article>
             ))}
           </div>

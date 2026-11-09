@@ -87,7 +87,7 @@ function mapRow(row: RawRow): ReviewRecord {
     similar: parseSimilar(row.similar),
     faq: parseFaq(row.faq),
     body: parseStringArray(row.body),
-    author: String(row.author ?? "Galgame 品鉴编辑部"),
+    author: String(row.author ?? "旮旯喵评编辑部"),
     publishedAt: String(row.published_at ?? ""),
     updatedAt: String(row.updated_at ?? ""),
   };
@@ -177,6 +177,22 @@ export const getReviewBySlug = cache(async (slug: string): Promise<ReviewRecord 
   const reviews = await getAllReviews();
   return reviews.find((review) => review.slug === slug) ?? null;
 });
+
+/**
+ * 资料库 ↔ 喵评的桥。
+ *
+ * 首选 guide_slug（编辑时明确挂上的作品 slug），老数据没有 guide_slug 时
+ * 再按作品名精确匹配，避免只因为标题前缀相同就乱配。
+ */
+export const getReviewForGame = cache(
+  async (guideSlug: string, title?: string): Promise<ReviewRecord | null> => {
+    const reviews = await getAllReviews();
+    const byGuideSlug = reviews.find((review) => review.guideSlug === guideSlug);
+    if (byGuideSlug) return byGuideSlug;
+    if (!title) return null;
+    return reviews.find((review) => review.title === title) ?? null;
+  },
+);
 
 export const getReviewSlugs = cache(async (): Promise<string[]> => {
   const reviews = await getAllReviews();

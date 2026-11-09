@@ -3,6 +3,7 @@ import type { GameRecord } from "@/lib/types/game";
 
 const sharedKeywords = [
   "Galgame",
+  "Galgame Guide",
   "视觉小说",
   "Galgame 游戏库",
   "视觉小说作品",
@@ -16,20 +17,27 @@ const sharedKeywords = [
  */
 const TITLE_MAX = 70;
 
-const BRAND_SUFFIX = " | Galgame Guide";
+const BRAND_SUFFIX = " | 旮旯喵评";
 
 /**
  * 全站共用的分享图。
  *
- * 为什么要有：2026-11-05 JEV SEO 审计实测 25 个页面只有 og:title 没有 og:image，
- * 分享到 Telegram / Discord / X 时是一条没有封面的裸链接，点击率吃亏。
- * 图片是 public/og.png（1200×630，暗底金线，和站内配色一致）。
+ * 2026-11-09 全站视觉统一后重新生成：奶油纸底 + 墨线猫猫 + 旮旯喵评字标，
+ * 和站内纸页主题一致。public/og.png（1200×630）。
  */
 export const OG_IMAGE = {
   url: "/og.png",
   width: 1200,
   height: 630,
-  alt: "Galgame Guide · Galgame 与视觉小说作品库",
+  alt: "旮旯喵评（Galgame Guide）· Galgame 与视觉小说作品库",
+};
+
+/** 喵评模块的专属分享图；全站默认分享图见 OG_IMAGE。 */
+export const REVIEW_OG_IMAGE = {
+  url: "/review-og.png",
+  width: 1200,
+  height: 630,
+  alt: "旮旯喵评 · 猫猫先替你玩一遍，再告诉你值不值得",
 };
 
 const KANA = /[\u3040-\u309f\u30a0-\u30ff]/;
@@ -124,7 +132,7 @@ export const buildGameDescription = (game: GameRecord) => {
     }
   }
 
-  return `${unique} — 在 Galgame Guide 查看简介、类型标签和下载入口。`;
+  return `${unique} — 在旮旯喵评资料库查看简介、类型标签和下载入口。`;
 };
 
 export const buildGameKeywords = (game: GameRecord) => [
@@ -152,13 +160,15 @@ const toIsoDateTime = (value: string) => {
 };
 
 export const buildHomeTitle = () =>
-  "Galgame 游戏库｜Galgame Guide";
+  "Galgame 游戏库｜旮旯喵评";
 
 export const buildHomeDescription = () =>
-  "收录 3800 多部 Galgame 与视觉小说，可按作品名、类型、平台和语言查找。每部都有简介、类型标签、版本和更新时间，找到想玩的直接跳下载页。";
+  "旮旯喵评（Galgame Guide）收录 3800 多部 Galgame 与视觉小说，可按作品名、类型、平台和语言查找。每部都有简介、类型标签、版本和更新时间，找到想玩的直接跳下载页。";
 
 export const buildHomeKeywords = () => [
   ...sharedKeywords,
+  "Galgame Guide",
+  "旮旯喵评",
   "Galgame 大全",
   "视觉小说推荐",
   "Galgame 下载",

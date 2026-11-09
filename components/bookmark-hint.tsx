@@ -34,25 +34,17 @@ export function BookmarkHint({ variant = "inline" }: { variant?: "inline" | "foo
   };
 
   const address = (
-    <button
-      type="button"
-      onClick={copy}
-      className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-4 py-2 font-mono text-xs text-ink-strong transition hover:border-accent/60 hover:text-accent sm:text-sm"
-    >
+    <button type="button" onClick={copy} className="miao-address">
       {SITE_HOST}
-      <span className="text-[11px] tracking-[0.1em] text-white/40 group-hover:text-accent/80">
-        {copied ? "已复制" : "复制"}
-      </span>
+      <span className="miao-address-hint">{copied ? "已复制" : "复制"}</span>
     </button>
   );
 
   if (variant === "footer") {
     return (
-      <div className="space-y-3">
-        <h4 className="text-xs font-bold tracking-widest text-white/40 uppercase">
-          收藏本站
-        </h4>
-        <p className="text-sm leading-6 text-ink-soft">
+      <div className="miao-bookmark miao-bookmark--footer">
+        <p className="miao-bookmark-title">收藏本站</p>
+        <p className="miao-bookmark-desc">
           本站的流量全靠搜索结果，哪天搜不到了就是真的没了。
         </p>
         {address}
@@ -61,25 +53,19 @@ export function BookmarkHint({ variant = "inline" }: { variant?: "inline" | "foo
   }
 
   return (
-    <section className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <h2 className="font-display text-xl text-ink-strong">怕下次找不到？</h2>
-          <p className="text-sm leading-7 text-ink-soft">
-            本站的内容全靠搜索结果显示，哪天搜不到了就是真的没了。花两秒存下来：
-            按{" "}
-            <kbd className="rounded border border-white/20 bg-black/40 px-1.5 py-0.5 font-mono text-xs">
-              Ctrl + D
-            </kbd>{" "}
-            收藏（Mac 用{" "}
-            <kbd className="rounded border border-white/20 bg-black/40 px-1.5 py-0.5 font-mono text-xs">
-              ⌘ + D
-            </kbd>
-            ），或者点右边复制地址。
-          </p>
-        </div>
-        {address}
+    <section className="miao-bookmark">
+      <div>
+        <h2 className="miao-bookmark-title">怕下次找不到？</h2>
+        <p className="miao-bookmark-desc">
+          本站的内容全靠搜索结果显示，哪天搜不到了就是真的没了。花两秒存下来：
+          按{" "}
+          <kbd>Ctrl + D</kbd>{" "}
+          收藏（Mac 用{" "}
+          <kbd>⌘ + D</kbd>
+          ），或者点右边复制地址。
+        </p>
       </div>
+      {address}
     </section>
   );
 }
