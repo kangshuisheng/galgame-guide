@@ -53,9 +53,18 @@ export function SiteFooter() {
             >
               KrzACG 社区 ↗
             </a>
-            {/* 这两个卫星站长期没有外部入链，Bing 的 AnchorCount 是 0、从未被发现。
+            {/* 卫星站长期没有外部入链，Bing 的 AnchorCount 是 0、从未被发现。
                 页脚 follow 链接是它们的发现路径：不要加 nofollow，也不要删。 */}
             <ul className="miao-footer-list">
+              <li>
+                <a
+                  href="https://krzacg.net"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  KrzACG 官网入口 · 最新地址 ↗
+                </a>
+              </li>
               <li>
                 <a
                   href="https://gal.krzvv.com"
