@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   keywords: [
     "Galgame Guide",
     "Galgame 索引",
+    "Galgame 品鉴",
+    "Galgame 评测",
+    "Galgame 评分",
     "视觉小说目录",
     "作品标签",
     "游戏版本情报",
@@ -85,6 +88,7 @@ function Footer() {
             <ul className="grid gap-2 text-sm text-ink-soft">
               <li><Link href="/" className="hover:text-accent">网站首页</Link></li>
               <li><Link href="/archive" className="hover:text-accent">全部作品</Link></li>
+              <li><Link href="/review" className="hover:text-accent">Galgame 品鉴</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
@@ -110,6 +114,30 @@ function Footer() {
             >
               KrzACG 社区 ↗
             </a>
+            {/* 这两个卫星站长期没有外部入链，Bing 的 AnchorCount 是 0、从未被发现。
+                页脚 follow 链接是它们的发现路径：不要加 nofollow，也不要删。 */}
+            <ul className="grid gap-2 text-sm text-ink-soft">
+              <li>
+                <a
+                  href="https://gal.krzvv.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent"
+                >
+                  Galgame 备用入口 ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://collection.krzvv.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent"
+                >
+                  Galgame 合集榜 ↗
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
         <div className="mt-12 border-t border-white/5 pt-8 text-center text-xs text-white/30">

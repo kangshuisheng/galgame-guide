@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { absoluteUrl } from "@/lib/config";
 import { getAllGames } from "@/lib/games";
+import { getAllReviews } from "@/lib/review/reviews";
 
 // Regenerate at runtime so the sitemap self-heals even if the build-time
 // database connection failed (otherwise it would ship with zero game URLs).
@@ -13,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     { path: "/", priority: 1.0, freq: "daily" as const },
     { path: "/archive", priority: 0.8, freq: "daily" as const },
+    { path: "/review", priority: 0.8, freq: "daily" as const },
     { path: "/about", priority: 0.3, freq: "monthly" as const },
     { path: "/contact", priority: 0.3, freq: "monthly" as const },
     { path: "/privacy", priority: 0.3, freq: "monthly" as const },
@@ -36,6 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  const reviews = await getAllReviews();
+  const reviewEntries: MetadataRoute.Sitemap = reviews.map((review) => ({
+    url: absoluteUrl(`/review/${review.slug}`),
+    lastModified: review.updatedAt ? new Date(review.updatedAt) : now,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...staticPages.map((page) => ({
       url: absoluteUrl(page.path),
@@ -43,6 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: page.freq,
       priority: page.priority,
     })),
+    ...reviewEntries,
     ...gameEntries,
   ];
 }

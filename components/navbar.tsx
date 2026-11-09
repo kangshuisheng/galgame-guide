@@ -6,6 +6,7 @@ import { useState } from "react";
 const navLinks = [
   { href: "/", label: "首页" },
   { href: "/archive", label: "全部作品" },
+  { href: "/review", label: "品鉴" },
   { href: "/about", label: "关于我们" },
   { href: "/contact", label: "联系" },
 ];

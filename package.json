@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "node scripts/build-redirects.mjs && next build",
     "build:redirects": "node scripts/build-redirects.mjs",
-    "db:init": "node scripts/init-db.mjs",
+    "db:init": "node scripts/init-db.mjs && node scripts/review/init-db.mjs",
     "content:sync": "node scripts/sync-content.mjs",
     "intro:gen": "node scripts/generate-intro.mjs",
     "intro:gen:zenmux": "INTRO_AI_PROVIDER=zenmux node scripts/generate-intro.mjs",
@@ -14,7 +14,11 @@
     "dedupe:games": "node scripts/dedupe-games.mjs",
     "start": "next start",
     "lint": "eslint",
-    "indexnow:all": "node scripts/indexnow-submit.mjs"
+    "indexnow:all": "node scripts/indexnow-submit.mjs",
+    "review:init": "node scripts/review/init-db.mjs",
+    "review:seed": "node scripts/review/seed-pilot.mjs",
+    "review:validate": "node scripts/review/validate.mjs",
+    "review:research": "node scripts/review/research.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.2",

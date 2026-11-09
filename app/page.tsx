@@ -5,6 +5,7 @@ import { BookmarkHint } from "@/components/bookmark-hint";
 import { GameCard } from "@/components/game-card";
 import { siteConfig } from "@/lib/config";
 import { getAllGames, getFeaturedGames, getTopTags } from "@/lib/games";
+import { getReviewCount } from "@/lib/review/reviews";
 import {
   buildCanonicalPath,
   buildHomeDescription,
@@ -37,6 +38,7 @@ export default async function HomePage() {
     getAllGames(),
     getTopTags(10),
   ]);
+  const reviewCount = await getReviewCount();
 
   // Sort by updatedAt for recent list
   const recentGames = [...allGames]
@@ -134,6 +136,25 @@ export default async function HomePage() {
             ))}
           </aside>
         </header>
+
+        <Link
+          href="/review"
+          className="group grid gap-6 rounded-[2.5rem] border border-accent/20 bg-[linear-gradient(135deg,rgba(214,169,107,0.12),rgba(214,169,107,0.025))] p-6 transition hover:border-accent/55 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center"
+        >
+          <div className="space-y-3">
+            <span className="eyebrow">Galgame 品鉴</span>
+            <h2 className="font-display text-4xl text-ink-strong group-hover:text-accent">
+              不写攻略，只告诉你值不值得玩。
+            </h2>
+            <p className="max-w-2xl text-sm leading-7 text-ink-soft">
+              按剧情、角色、音乐、美术、系统五个维度打分。结论、亮点、不足和适合谁，
+              一次讲清楚。目前已品鉴 {reviewCount} 部。
+            </p>
+          </div>
+          <span className="inline-flex rounded-full bg-accent px-5 py-3 text-sm font-semibold text-black transition group-hover:bg-accent-strong">
+            进入品鉴 →
+          </span>
+        </Link>
 
         <section id="hot-list" className="space-y-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
