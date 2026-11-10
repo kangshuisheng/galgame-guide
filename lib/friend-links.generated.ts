@@ -21,7 +21,7 @@ export const FRIEND_LINKS: FriendLink[] = [
   {
     "name": "Galgame 入口导航",
     "url": "https://gal.krzvv.com",
-    "description": "Galgame 入口导航：资料、资源、社区、工具四类站点，附 KrzACG 主站备用地址。",
+    "description": "Galgame 入口导航：本站生态、资料、资源与工具分类，常用入口优先自家站点，附 KrzACG 主站备用地址。",
     "adult": false
   },
   {
