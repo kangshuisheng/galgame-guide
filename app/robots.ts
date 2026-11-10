@@ -14,7 +14,9 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // /go 是出站跳转，爬虫跟过去就会看到主站域名 —— 这正是要避免的关联
-        disallow: ["/api/", "/go"],
+        // /archive? 是筛选/排序/搜索参数页，页面本身已经 noindex；
+        // 放出来只会让 Bing 把抓取预算花在永远不收录的 URL 上。
+        disallow: ["/api/", "/go", "/archive?"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),

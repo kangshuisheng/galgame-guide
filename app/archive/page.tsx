@@ -23,7 +23,7 @@ export async function generateMetadata({
   const params = await searchParams;
   const isFiltered = Boolean(params.q || params.tag || params.sort || Number(params.page) > 1);
   return {
-    title: "全部作品",
+    title: "Galgame 游戏大全｜全部作品",
     description:
       "浏览旮旯喵评资料库收录的全部 Galgame 与视觉小说，可按作品名、题材或平台查找，也能按热度和更新时间排序。",
     alternates: {

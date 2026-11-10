@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { BookmarkHint } from "@/components/bookmark-hint";
-import { buildGoPath, siteConfig } from "@/lib/config";
+import { siteConfig } from "@/lib/config";
+import { FRIEND_LINKS, FRIEND_LINKS_HEADING } from "@/lib/friend-links.generated";
 
 export function SiteFooter() {
   return (
@@ -40,49 +41,28 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="miao-footer-heading">合作伙伴</h3>
+            <h3 className="miao-footer-heading">{FRIEND_LINKS_HEADING}</h3>
             <p className="miao-footer-desc">
               本站只整理资料，不存游戏文件。下载请到资源站。
             </p>
-            <a
-              href={buildGoPath("site")}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              referrerPolicy="no-referrer"
-              className="miao-footer-link"
-            >
-              KrzACG 社区 ↗
-            </a>
+            <form className="miao-footer-go" action="/go" method="get" target="_blank">
+              <input type="hidden" name="to" value="site" />
+              <button type="submit" className="miao-footer-link">KrzACG 社区 ↗</button>
+            </form>
             {/* 卫星站长期没有外部入链，Bing 的 AnchorCount 是 0、从未被发现。
                 页脚 follow 链接是它们的发现路径：不要加 nofollow，也不要删。 */}
             <ul className="miao-footer-list">
-              <li>
-                <a
-                  href="https://krzacg.net"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  KrzACG 官网入口 · 最新地址 ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://gal.krzvv.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Galgame 备用入口 ↗
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://collection.krzvv.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Galgame 合集榜 ↗
-                </a>
-              </li>
+              {FRIEND_LINKS.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.name} ↗
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

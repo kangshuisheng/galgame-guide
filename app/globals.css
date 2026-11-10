@@ -459,9 +459,19 @@ button {
 .miao-footer-link {
   display: inline-block;
   margin-top: 0.9rem;
+  border: 0;
+  background: none;
+  padding: 0;
   color: var(--miao-ink-soft);
+  font: inherit;
   font-size: 0.84rem;
+  cursor: pointer;
 }
+
+.miao-footer-go {
+  margin: 0;
+}
+
 
 .miao-footer-bottom {
   display: flex;
@@ -1367,10 +1377,19 @@ button {
   text-transform: uppercase;
 }
 
+.miao-download-form {
+  margin: 0;
+}
+
 .miao-download-button {
   position: relative;
   display: flex;
+  width: 100%;
   overflow: hidden;
+  appearance: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
   align-items: center;
   gap: 0.8rem;
   margin-top: 0.65rem;

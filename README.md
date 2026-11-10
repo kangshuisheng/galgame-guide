@@ -57,7 +57,7 @@ pnpm content:sync --dry-run       # 只统计，不写库
 
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" \
-  "https://galgame-guide.vercel.app/api/cron/sync-content?dry_run=1"
+  "https://galgame.krzvv.com/api/cron/sync-content?dry_run=1"
 ```
 
 核心环境变量：

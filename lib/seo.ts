@@ -169,6 +169,8 @@ export const buildHomeKeywords = () => [
   ...sharedKeywords,
   "Galgame Guide",
   "旮旯喵评",
+  "Galgame 游戏网站",
+  "Galgame 游戏库",
   "Galgame 大全",
   "视觉小说推荐",
   "Galgame 下载",

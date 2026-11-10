@@ -7,7 +7,6 @@ import { BookmarkHint } from "@/components/bookmark-hint";
 import { MainSiteCta, MobileStickyCta } from "@/components/main-site-cta";
 import { RelatedGames } from "@/components/related-games";
 import { CatMascot } from "@/components/review/cat-mascot";
-import { buildGoPath } from "@/lib/config";
 import { getAllGames, getAllSlugs, getGameBySlug } from "@/lib/games";
 import { getRelatedGames } from "@/lib/related-games";
 import { getReviewForGame } from "@/lib/review/reviews";
@@ -190,10 +189,9 @@ export default async function GamePage({
                 作品名称、简介与版本信息整理自开发商、发行方和商店页面的公开资料。
                 发现错漏，欢迎到{" "}
                 <a
-                  href={buildGoPath("site")}
+                  href="https://krzacg.net"
                   target="_blank"
-                  rel="nofollow noopener noreferrer"
-                  referrerPolicy="no-referrer"
+                  rel="noopener noreferrer"
                 >
                   KrzACG 社区
                 </a>{" "}

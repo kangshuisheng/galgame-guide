@@ -7,7 +7,7 @@
 
 | # | 检查项 | 怎么查 | 期望 |
 |---|---|---|---|
-| 1 | `NEXT_PUBLIC_SITE_URL` 已在 Vercel 配置 | Vercel → Settings → Environment Variables | `https://galgame-guide.vercel.app`（或自有域名） |
+| 1 | `NEXT_PUBLIC_SITE_URL` 已在 Vercel 配置 | Vercel → Settings → Environment Variables | `https://galgame.krzvv.com`（或自有域名） |
 | 2 | `NEXT_PUBLIC_MAIN_SITE_URL` 已配置 | 同上 | `https://www.krzacg.com` |
 | 3 | `CRON_SECRET` 已配置 | 同上 | 任意长随机串；不配则 cron 退回 UA 识别（可伪造，生产必须配） |
 | 4 | `CRON_SYNC_MAX_PAGES`（可选） | 同上 | 默认 2（约 100 条/天），不配也行 |
@@ -35,7 +35,7 @@ git push origin main
 ## 2. 部署后逐项验证（每条都要实测，不要只看代码）
 
 ```bash
-BASE=https://galgame-guide.vercel.app
+BASE=https://galgame.krzvv.com
 
 # 品牌已切换
 curl -s $BASE/ | grep -o '<title>[^<]*'                 # 期望：Galgame Guide｜...

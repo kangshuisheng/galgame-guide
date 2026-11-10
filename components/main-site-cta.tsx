@@ -1,5 +1,3 @@
-import { buildGoPath } from "@/lib/config";
-
 /**
  * 作品页的主行动按钮 —— 整站唯一真正要用户点的东西。
  *
@@ -7,6 +5,11 @@ import { buildGoPath } from "@/lib/config";
  *   1. 用户一眼看到、知道点了会发生什么；
  *   2. HTML 里不出现主站域名。
  * 第 2 点靠 `/go?to=<id>` 这个同源跳转实现，理由见 app/go/route.ts。
+ *
+ * 2026-11-10：`/go` 不再写成 `<a href>`，改成同源 GET 表单。
+ * Bing 后台每天有 1,400+ 个 /go 请求被 robots.txt 拦掉（BlockedByRobotsTxt），
+ * 链接虽然带 nofollow，爬虫仍会抓；表单 action 不会进入爬虫链接队列，
+ * 用户点击目标不变，同时把抓取预算留给作品页。
  *
  * 2026-11-01：访客 74% 来自美国 / 香港 / 新加坡 / 日本，内地只占 1%。
  * 按钮以「下载图标 + Download」为主、「前往下载页」为辅：图标和英文
@@ -54,16 +57,15 @@ export function MainSiteCta({ sourceId, title }: { sourceId: string; title: stri
         Download · 资源下载
       </p>
 
-      <a
-        href={buildGoPath(sourceId)}
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-        referrerPolicy="no-referrer"
-        // 全站唯一要回答的问题：这个按钮到底有没有人点。
-        data-umami-event="guide-deeplink"
-        data-umami-event-post-id={sourceId}
-        className="miao-download-button"
-      >
+      <form className="miao-download-form" action="/go" method="get" target="_blank">
+        <input type="hidden" name="to" value={sourceId} />
+        <button
+          type="submit"
+          // 全站唯一要回答的问题：这个按钮到底有没有人点。
+          data-umami-event="guide-deeplink"
+          data-umami-event-post-id={sourceId}
+          className="miao-download-button"
+        >
         <span className="miao-download-icon">
           <span className="cta-icon-halo absolute inset-0 rounded-2xl" />
           <DownloadIcon className="relative size-6" />
@@ -76,7 +78,8 @@ export function MainSiteCta({ sourceId, title }: { sourceId: string; title: stri
 
         <span className="miao-download-arrow cta-arrow" aria-hidden="true">→</span>
         <span className="cta-shine" aria-hidden="true" />
-      </a>
+        </button>
+      </form>
 
       <p className="miao-download-note">
         打开《{title}》的下载页面 · 本站不存游戏文件
@@ -89,15 +92,14 @@ export function MainSiteCta({ sourceId, title }: { sourceId: string; title: stri
 export function MobileStickyCta({ sourceId }: { sourceId: string }) {
   return (
     <div className="miao-mobile-cta">
-      <a
-        href={buildGoPath(sourceId)}
-        target="_blank"
-        rel="nofollow noopener noreferrer"
-        referrerPolicy="no-referrer"
-        data-umami-event="guide-deeplink-sticky"
-        data-umami-event-post-id={sourceId}
-        className="miao-download-button"
-      >
+      <form className="miao-download-form" action="/go" method="get" target="_blank">
+        <input type="hidden" name="to" value={sourceId} />
+        <button
+          type="submit"
+          data-umami-event="guide-deeplink-sticky"
+          data-umami-event-post-id={sourceId}
+          className="miao-download-button"
+        >
         <span className="miao-download-icon">
           <DownloadIcon className="size-5" />
         </span>
@@ -107,7 +109,8 @@ export function MobileStickyCta({ sourceId }: { sourceId: string }) {
         </span>
         <span className="miao-download-arrow cta-arrow" aria-hidden="true">→</span>
         <span className="cta-shine" aria-hidden="true" />
-      </a>
+        </button>
+      </form>
     </div>
   );
 }
